@@ -1,0 +1,175 @@
+let currentSheet = null;
+let currentPage = 1;
+let currentData = [];
+let currentHeaders = [];
+const itemsPerPage = 20;
+
+async function loadSheet(sheetName) {
+    currentSheet = sheetName;
+    currentPage = 1;
+    showLoading();
+
+    try {
+        const data = await getSheetData(sheetName);
+        currentData = data;
+        
+        if (data.length > 0) {
+            currentHeaders = Object.keys(data[0]);
+        }
+        
+        renderSheetData();
+    } catch (error) {
+        console.error("Error loading sheet:", error);
+        showError(`Gagal memuat data ${sheetName}: ${error.message}`);
+    }
+}
+
+function renderSheetData() {
+    const content = document.getElementById("content");
+    
+    if (!currentData || currentData.length === 0) {
+        content.innerHTML = `
+            <div class="card">
+                <h2>📄 ${escapeHtml(currentSheet)}</h2>
+                <p>Tidak ada data di sheet ini.</p>
+                <p class="text-muted">Silakan tambahkan data di Google Spreadsheet.</p>
+                <button onclick="loadDashboard()" class="btn-primary" style="margin-top:16px;">← Kembali ke Dashboard</button>
+            </div>
+        `;
+        return;
+    }
+
+    const totalPages = Math.ceil(currentData.length / itemsPerPage);
+    const startIdx = (currentPage - 1) * itemsPerPage;
+    const endIdx = startIdx + itemsPerPage;
+    const pageData = currentData.slice(startIdx, endIdx);
+
+    let html = `
+        <div class="sheet-header">
+            <h2>📄 ${escapeHtml(currentSheet)}</h2>
+            <div class="sheet-stats">📊 ${currentData.length} item ditemukan</div>
+        </div>
+
+        <div class="card">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            ${currentHeaders.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${pageData.map((row, idx) => renderTableRow(row, startIdx + idx)).join('')}
+                    </tbody>
+                </table>
+            </div>
+    `;
+
+    if (totalPages > 1) {
+        html += `
+            <div class="pagination">
+                <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>◀ Sebelumnya</button>
+                <span>Halaman ${currentPage} dari ${totalPages}</span>
+                <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Berikutnya ▶</button>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    content.innerHTML = html;
+}
+
+function renderTableRow(row, index) {
+    return `
+        <tr onclick="showDetail(${index})">
+            ${currentHeaders.map(col => {
+                const value = row[col] || '';
+                const truncated = value.length > 50 ? value.substring(0, 50) + '...' : value;
+                return `<td title="${escapeHtml(value)}">${escapeHtml(truncated)}</td>`;
+            }).join('')}
+            <td>
+                <button class="btn-small" onclick="event.stopPropagation(); showDetail(${index})">👁️ Detail</button>
+            </td>
+        </tr>
+    `;
+}
+
+function changePage(delta) {
+    currentPage += delta;
+    renderSheetData();
+}
+
+function showDetail(index) {
+    const item = currentData[index];
+    if (!item) return;
+
+    const content = document.getElementById("content");
+    
+    let detailsHtml = `
+        <div class="card detail-card">
+            <div class="detail-header">
+                <h2>📋 Detail Item - ${escapeHtml(currentSheet)}</h2>
+                <button class="btn-close" onclick="loadSheet('${currentSheet}')">✖ Kembali</button>
+            </div>
+            <div class="detail-body">
+    `;
+
+    for (const [key, value] of Object.entries(item)) {
+        if (key === '_rowData') continue;
+        detailsHtml += `
+            <div class="detail-row">
+                <div class="detail-label">${escapeHtml(key)}</div>
+                <div class="detail-value">
+                    ${isUrl(value) ? `<a href="${value}" target="_blank" rel="noopener">${escapeHtml(value)}</a>` : 
+                      value ? `<pre>${escapeHtml(String(value))}</pre>` : '-'}
+                </div>
+            </div>
+        `;
+    }
+
+    detailsHtml += `
+            </div>
+            <div class="detail-footer">
+                <button onclick="loadSheet('${currentSheet}')" class="btn-primary">📄 Lihat semua di ${escapeHtml(currentSheet)}</button>
+            </div>
+        </div>
+    `;
+
+    content.innerHTML = detailsHtml;
+    // Clear search results if any
+    const searchResults = document.getElementById("searchResults");
+    if (searchResults) searchResults.innerHTML = "";
+}
+
+function isUrl(str) {
+    if (!str || typeof str !== 'string') return false;
+    return str.startsWith('http://') || str.startsWith('https://') || 
+           str.includes('drive.google.com') || str.includes('docs.google.com');
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function showLoading() {
+    const content = document.getElementById("content");
+    content.innerHTML = `<div class="card"><h3>🔄 Memuat data...</h3><p>Mengambil data dari Google Sheets...</p></div>`;
+}
+
+function showError(message) {
+    const content = document.getElementById("content");
+    content.innerHTML = `
+        <div class="card error-card">
+            <h3>⚠️ Error</h3>
+            <p>${message}</p>
+            <button onclick="loadDashboard()" class="btn-primary" style="margin-top:16px;">🔄 Kembali ke Dashboard</button>
+        </div>
+    `;
+}
