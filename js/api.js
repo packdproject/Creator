@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbwzfxm2zCdfHgJyKtp6QllTiZN4xGQ5mKZ3ymxN5qyC-vAEqokS3twFfG7r5ALeqsId/exec";
+const API_URL = "";const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5UL0HyAYtMz7MWb5kQoqmJM1PIDG1RA64AxArCAqQLs_IG/exec";
 
 async function getSheets() {
     const res = await fetch(`${API_URL}?action=sheets`);
