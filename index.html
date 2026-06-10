@@ -3,15 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="description" content="Creator Vault - Personal Knowledge Hub & Digital Library">
     <title>Creator Vault - Personal Knowledge Hub</title>
-    
     <style>
-        /* ========================================
-           CREATOR VAULT - COMPLETE STYLESHEET
-           ======================================== */
-        
-        /* Reset & Base */
         * {
             margin: 0;
             padding: 0;
@@ -19,14 +12,12 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: #0a0a0a;
             color: #ffffff;
             line-height: 1.5;
-            overflow-x: hidden;
         }
 
-        /* App Layout */
         .app {
             display: flex;
             min-height: 100vh;
@@ -42,20 +33,6 @@
             top: 0;
             height: 100vh;
             overflow-y: auto;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: #3a3a3a;
-            border-radius: 4px;
         }
 
         .logo {
@@ -64,14 +41,6 @@
             margin-bottom: 24px;
             padding-bottom: 16px;
             border-bottom: 1px solid #1f1f1f;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .logo::before {
-            content: "🏦";
-            font-size: 24px;
         }
 
         .menu {
@@ -83,11 +52,8 @@
             border-radius: 10px;
             cursor: pointer;
             margin-bottom: 4px;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
             font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .menu-item:hover {
@@ -103,17 +69,14 @@
         .menu-separator {
             font-size: 11px;
             color: #333;
-            cursor: default;
             padding: 8px 12px;
-            letter-spacing: 1px;
         }
 
-        /* Main Content */
+        /* Main */
         .main {
             flex: 1;
             padding: 28px 32px;
             overflow-x: auto;
-            background: #0a0a0a;
         }
 
         .header {
@@ -122,12 +85,10 @@
 
         .header h1 {
             font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff 0%, #4a9eff 100%);
+            background: linear-gradient(135deg, #fff, #4a9eff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 6px;
         }
 
         .header p {
@@ -135,28 +96,21 @@
             font-size: 14px;
         }
 
-        /* Search Box */
+        /* Search */
         .search-box {
             width: 100%;
             padding: 14px 18px;
             border: 1px solid #1f1f1f;
             border-radius: 14px;
             background: #121212;
-            color: #ffffff;
+            color: #fff;
             font-size: 15px;
             margin-bottom: 24px;
-            transition: all 0.2s ease;
         }
 
         .search-box:focus {
             outline: none;
             border-color: #4a9eff;
-            background: #0d0d0d;
-            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
-        }
-
-        .search-box::placeholder {
-            color: #555;
         }
 
         /* Cards */
@@ -166,85 +120,34 @@
             border-radius: 20px;
             padding: 24px;
             margin-bottom: 24px;
-            transition: all 0.2s ease;
         }
 
-        .card:hover {
-            border-color: #252525;
-        }
-
-        /* Dashboard Stats */
-        .dashboard-welcome {
-            margin-bottom: 32px;
-        }
-
-        .dashboard-welcome h1 {
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #ffffff, #4a9eff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .dashboard-welcome p {
-            color: #888;
-            font-size: 15px;
-        }
-
-        .last-updated {
-            font-size: 11px;
-            color: #555;
-            margin-top: 12px;
-        }
-
-        /* Stats Grid */
+        /* Stats */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 32px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #0f0f1a 0%, #0a0a12 100%);
+            background: linear-gradient(135deg, #0f0f1a, #0a0a12);
             border-radius: 20px;
             padding: 24px;
             text-align: center;
             border: 1px solid #1f1f2a;
-            position: relative;
-            overflow: hidden;
-            transition: transform 0.2s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: #2a2a3a;
         }
 
         .stat-number {
             font-size: 48px;
             font-weight: 800;
             color: #4a9eff;
-            line-height: 1;
         }
 
         .stat-label {
             margin-top: 10px;
             color: #aaa;
             font-size: 13px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .stat-icon {
-            position: absolute;
-            bottom: 12px;
-            right: 16px;
-            font-size: 48px;
-            opacity: 0.08;
         }
 
         /* Sheet Grid */
@@ -260,16 +163,14 @@
             border-radius: 16px;
             padding: 20px;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.25s;
             border: 1px solid #1f1f1f;
-            position: relative;
         }
 
         .sheet-card:hover {
             transform: translateY(-3px);
             border-color: #4a9eff;
             background: #181818;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
         .sheet-icon {
@@ -280,31 +181,17 @@
         .sheet-name {
             font-weight: 700;
             font-size: 17px;
-            margin-bottom: 6px;
         }
 
         .sheet-count {
             font-size: 12px;
             color: #4a9eff;
-            font-weight: 500;
+            margin-top: 6px;
         }
 
-        .sheet-hover {
-            font-size: 11px;
-            color: #555;
-            margin-top: 10px;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .sheet-card:hover .sheet-hover {
-            opacity: 1;
-        }
-
-        /* Table Styles */
+        /* Table */
         .table-responsive {
             overflow-x: auto;
-            margin-top: 16px;
         }
 
         .table {
@@ -315,24 +202,15 @@
 
         .table th,
         .table td {
-            padding: 14px 12px;
+            padding: 12px;
             border-bottom: 1px solid #1a1a1a;
             text-align: left;
         }
 
         .table th {
             background: #0f0f0f;
-            font-weight: 600;
             color: #aaa;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: sticky;
-            top: 0;
-        }
-
-        .table tbody tr {
-            transition: background 0.15s;
+            font-weight: 600;
         }
 
         .table tbody tr:hover {
@@ -344,7 +222,6 @@
         .pagination {
             display: flex;
             justify-content: center;
-            align-items: center;
             gap: 16px;
             margin-top: 24px;
             padding-top: 20px;
@@ -358,14 +235,6 @@
             border-radius: 40px;
             color: white;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .pagination button:hover:not(:disabled) {
-            background: #1f1f1f;
-            border-color: #4a9eff;
         }
 
         .pagination button:disabled {
@@ -373,271 +242,72 @@
             cursor: not-allowed;
         }
 
-        .pagination span {
-            color: #888;
-            font-size: 13px;
-        }
-
-        /* Detail View */
+        /* Detail */
         .detail-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             margin-bottom: 20px;
             padding-bottom: 16px;
             border-bottom: 1px solid #1f1f1f;
         }
 
-        .detail-header h2 {
-            font-size: 20px;
+        .detail-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #1a1a1a;
         }
 
-        .btn-close,
-        .btn-primary,
-        .btn-secondary {
+        .detail-label {
+            width: 180px;
+            font-weight: 600;
+            color: #4a9eff;
+        }
+
+        .detail-value {
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .detail-value pre {
+            background: #0a0a0a;
+            padding: 8px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .btn-primary, .btn-secondary, .btn-small {
             border: none;
             padding: 8px 18px;
             border-radius: 40px;
             color: white;
             cursor: pointer;
             font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s;
         }
 
-        .btn-close,
         .btn-primary {
             background: #4a9eff;
         }
 
-        .btn-close:hover,
         .btn-primary:hover {
             background: #3a7ecc;
-            transform: translateY(-1px);
         }
 
         .btn-secondary {
             background: #1f1f1f;
         }
 
-        .btn-secondary:hover {
-            background: #2a2a2a;
-        }
-
         .btn-small {
             background: #1a1a1a;
-            border: 1px solid #2a2a2a;
             padding: 4px 12px;
-            border-radius: 20px;
-            color: white;
-            cursor: pointer;
             font-size: 11px;
-            transition: all 0.2s;
         }
 
-        .btn-small:hover {
-            background: #2a2a2a;
-            border-color: #4a9eff;
-        }
-
-        .detail-body {
-            max-height: 65vh;
-            overflow-y: auto;
-        }
-
-        .detail-body::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .detail-body::-webkit-scrollbar-track {
-            background: #0a0a0a;
-        }
-
-        .detail-body::-webkit-scrollbar-thumb {
-            background: #2a2a2a;
-            border-radius: 4px;
-        }
-
-        .detail-row {
-            display: flex;
-            padding: 14px 0;
-            border-bottom: 1px solid #1a1a1a;
-        }
-
-        .detail-label {
-            width: 200px;
-            font-weight: 600;
-            color: #4a9eff;
-            flex-shrink: 0;
-            font-size: 13px;
-        }
-
-        .detail-value {
-            flex: 1;
-            word-break: break-word;
-            font-size: 13px;
-        }
-
-        .detail-value pre {
-            background: #0a0a0a;
-            padding: 12px;
-            border-radius: 12px;
-            overflow-x: auto;
-            font-family: 'Courier New', 'Fira Code', monospace;
-            font-size: 12px;
-            margin: 0;
-            white-space: pre-wrap;
-            border: 1px solid #1a1a1a;
-        }
-
-        .detail-value a {
-            color: #4a9eff;
-            text-decoration: none;
-        }
-
-        .detail-value a:hover {
-            text-decoration: underline;
-        }
-
-        .detail-footer {
-            margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid #1f1f1f;
-            text-align: right;
-            display: flex;
-            gap: 12px;
-            justify-content: flex-end;
-        }
-
-        /* Search Results */
-        .search-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .search-stats {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .search-icon {
-            font-size: 20px;
-        }
-
-        .search-keyword {
-            background: #1a1a1a;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: #4a9eff;
-            font-weight: 500;
-        }
-
-        .search-count {
-            color: #888;
-            font-size: 13px;
-        }
-
-        .search-group {
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-
-        .search-sheet-header {
-            font-size: 15px;
-            font-weight: 600;
-            padding: 14px 16px;
-            background: #0f0f0f;
-            border-radius: 14px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            transition: all 0.2s;
-        }
-
-        .search-sheet-header:hover {
-            background: #161616;
-        }
-
-        .badge {
-            background: #4a9eff;
-            padding: 2px 12px;
-            border-radius: 30px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .search-items {
-            margin-top: 8px;
-        }
-
-        .search-item {
-            padding: 14px 16px;
-            border-bottom: 1px solid #1a1a1a;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-radius: 12px;
-        }
-
-        .search-item:hover {
-            background: #121212;
-        }
-
-        .search-item-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 14px;
-        }
-
-        .search-item-preview {
-            font-size: 12px;
-            color: #777;
-            line-height: 1.4;
-        }
-
-        .search-more {
-            padding: 12px 16px;
-            text-align: center;
-            color: #4a9eff;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            border-top: 1px solid #1a1a1a;
-        }
-
-        .search-more:hover {
-            background: #0f0f0f;
-        }
-
-        /* Empty States */
-        .empty-search,
-        .empty-sheet {
-            text-align: center;
-            padding: 48px 24px;
-        }
-
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        /* Filter Bar */
         .filter-bar {
             display: flex;
             gap: 12px;
             margin-bottom: 20px;
             padding-bottom: 16px;
             border-bottom: 1px solid #1a1a1a;
-            flex-wrap: wrap;
         }
 
         .filter-bar input {
@@ -647,15 +317,8 @@
             border: 1px solid #2a2a2a;
             border-radius: 40px;
             color: white;
-            font-size: 13px;
         }
 
-        .filter-bar input:focus {
-            outline: none;
-            border-color: #4a9eff;
-        }
-
-        /* Sheet Header */
         .sheet-header {
             display: flex;
             justify-content: space-between;
@@ -663,46 +326,6 @@
             margin-bottom: 24px;
             flex-wrap: wrap;
             gap: 16px;
-        }
-
-        .sheet-header h2 {
-            font-size: 24px;
-        }
-
-        .sheet-stats {
-            color: #4a9eff;
-            font-size: 13px;
-            margin-top: 6px;
-        }
-
-        .sheet-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        /* Tips Card */
-        .tips-card ul {
-            margin-left: 20px;
-            margin-top: 14px;
-        }
-
-        .tips-card li {
-            margin: 10px 0;
-            color: #aaa;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .tips-card li::marker {
-            color: #4a9eff;
-        }
-
-        /* Loading States */
-        .loading-card,
-        .error-card,
-        .warning-card {
-            text-align: center;
-            padding: 48px 24px;
         }
 
         .loading-spinner {
@@ -715,179 +338,71 @@
             animation: spin 1s linear infinite;
         }
 
-        .loading-spinner-small {
-            width: 18px;
-            height: 18px;
-            display: inline-block;
-            margin-right: 10px;
-            vertical-align: middle;
-            border: 2px solid #1f1f1f;
-            border-top: 2px solid #4a9eff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .error-card {
-            border-color: #4a1a1a;
-            background: #1a0a0a;
+        .badge {
+            background: #4a9eff;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 11px;
         }
 
-        .text-muted {
-            color: #555;
-            font-size: 12px;
-            margin-top: 8px;
+        .search-item {
+            padding: 12px;
+            border-bottom: 1px solid #1a1a1a;
+            cursor: pointer;
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .search-item:hover {
+            background: #121212;
         }
 
-        .card,
-        .sheet-card,
-        .stat-card,
-        .search-group {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
-            .app {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                border-right: none;
-                border-bottom: 1px solid #1f1f1f;
-                padding: 16px;
-            }
-
-            .menu {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-
-            .menu-item {
-                padding: 8px 14px;
-                font-size: 13px;
-            }
-
-            .menu-separator {
-                display: none;
-            }
-
-            .main {
-                padding: 20px 16px;
-            }
-
-            .stats-grid,
-            .sheet-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .detail-row {
-                flex-direction: column;
-            }
-
-            .detail-label {
-                width: 100%;
-                margin-bottom: 6px;
-            }
-
-            .sheet-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .pagination {
-                flex-wrap: wrap;
-            }
-
-            .detail-footer {
-                flex-direction: column;
-            }
-
-            .detail-footer button {
-                width: 100%;
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #0a0a0a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #2a2a2a;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3a3a3a;
+            .app { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; }
+            .menu { display: flex; flex-wrap: wrap; gap: 8px; }
+            .menu-separator { display: none; }
+            .main { padding: 16px; }
+            .detail-row { flex-direction: column; }
+            .detail-label { width: 100%; margin-bottom: 6px; }
         }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="logo">Creator Vault</div>
+            <div class="logo">🏦 Creator Vault</div>
             <ul class="menu" id="sidebarMenu">
-                <li class="loading">🔄 Memuat menu...</li>
+                <li>Loading...</li>
             </ul>
         </aside>
 
-        <!-- Main Content -->
         <main class="main">
             <div class="header">
                 <h1>Creator Vault</h1>
                 <p>Personal Knowledge Hub & Digital Library</p>
             </div>
 
-            <!-- Search -->
-            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari ebook, produk, prompt, affiliate... (min 2 karakter)">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari ebook, produk, prompt, affiliate...">
 
-            <!-- Search Results -->
             <div id="searchResults"></div>
-
-            <!-- Dynamic Content -->
             <div id="content">
                 <div class="card">
                     <div class="loading-spinner"></div>
                     <h3>Memulai Creator Vault...</h3>
-                    <p>Menghubungkan ke database...</p>
                 </div>
             </div>
         </main>
     </div>
 
     <script>
-        // ==================== CONFIGURATION ====================
+        // ==================== CONFIG ====================
         const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5UL0HyAYtMz7MWb5kQoqmJM1PIDG1RA64AxArCAqQLs_IG/exec";
         const ITEMS_PER_PAGE = 20;
 
-        // ==================== GLOBAL VARIABLES ====================
+        // ==================== GLOBAL ====================
         let currentSheet = null;
         let currentPage = 1;
         let currentData = [];
@@ -899,39 +414,73 @@
         async function getSheets() {
             try {
                 const res = await fetch(`${API_URL}?action=sheets`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
-                console.log("Sheets loaded:", data);
+                console.log("getSheets response:", data);
+                
                 if (Array.isArray(data)) return data;
                 if (data && Array.isArray(data.sheets)) return data.sheets;
                 if (data && Array.isArray(data.data)) return data.data;
+                
+                // Fallback manual
                 return ["Ebook", "Produk", "TemplateChat", "Affiliate", "PromptAI", "IdeKonten", "Notes"];
             } catch (error) {
                 console.error("getSheets error:", error);
-                return ["Ebook", "Produk", "TemplateChat", "Affiliate", "PromptAI", "IdeKonten", "Notes"];
+                return ["Ebook", "Produk", "TemplateChat", "Affiliate", "PromptAI"];
             }
         }
 
         async function getSheetData(sheetName) {
             try {
                 const res = await fetch(`${API_URL}?action=data&sheet=${encodeURIComponent(sheetName)}`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 
-                if (Array.isArray(data) && data.length > 0) {
+                console.log(`📊 Data untuk "${sheetName}":`, data);
+                
+                // CASE 1: Array of objects langsung
+                if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object' && !Array.isArray(data[0])) {
+                    console.log(`✅ ${sheetName} adalah array of objects, ${data.length} items`);
+                    return data;
+                }
+                
+                // CASE 2: 2D array [[headers], [rows]]
+                if (Array.isArray(data) && data.length >= 2 && Array.isArray(data[0])) {
                     const headers = data[0];
                     const rows = data.slice(1);
+                    console.log(`✅ ${sheetName} dikonversi dari 2D array, headers:`, headers);
                     return rows.map(row => {
                         const obj = {};
-                        headers.forEach((header, idx) => {
-                            obj[header] = row[idx] || "";
+                        headers.forEach((h, i) => {
+                            obj[h] = row[i] !== undefined ? row[i] : "";
                         });
                         return obj;
                     });
                 }
+                
+                // CASE 3: Dibalut object {success: true, data: ...}
+                if (data && data.success === true && data.data) {
+                    const inner = data.data;
+                    if (Array.isArray(inner) && inner.length >= 2 && Array.isArray(inner[0])) {
+                        const headers = inner[0];
+                        const rows = inner.slice(1);
+                        return rows.map(row => {
+                            const obj = {};
+                            headers.forEach((h, i) => obj[h] = row[i] || "");
+                            return obj;
+                        });
+                    }
+                    if (Array.isArray(inner)) return inner;
+                }
+                
+                // CASE 4: Single object
+                if (data && typeof data === 'object' && !Array.isArray(data) && Object.keys(data).length > 0) {
+                    return [data];
+                }
+                
+                console.warn(`⚠️ Format tidak dikenal untuk ${sheetName}:`, typeof data);
                 return [];
+                
             } catch (error) {
-                console.error(`getSheetData ${sheetName} error:`, error);
+                console.error(`❌ getSheetData ${sheetName} error:`, error);
                 return [];
             }
         }
@@ -940,208 +489,104 @@
             if (!keyword || keyword.length < 2) return [];
             try {
                 const res = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(keyword)}`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 if (Array.isArray(data)) return data;
                 return [];
             } catch (error) {
-                console.error("searchData error:", error);
+                console.error("search error:", error);
                 return [];
-            }
-        }
-
-        async function testAPIConnection() {
-            try {
-                const sheets = await getSheets();
-                return { success: true, sheets: sheets, count: sheets.length };
-            } catch (error) {
-                return { success: false, error: error.message };
             }
         }
 
         // ==================== SIDEBAR ====================
         async function loadSidebar() {
             const menu = document.getElementById("sidebarMenu");
-            if (!menu) return;
+            menu.innerHTML = '<li>🔄 Memuat menu...</li>';
             
-            menu.innerHTML = '<li class="loading">🔄 Memuat menu...</li>';
-
             try {
                 const sheets = await getSheets();
                 menu.innerHTML = "";
-
-                // Dashboard
+                
                 const dashLi = document.createElement("li");
                 dashLi.textContent = "📊 Dashboard";
                 dashLi.className = "menu-item active";
-                dashLi.onclick = () => {
-                    setActiveMenu(dashLi);
-                    loadDashboard();
-                };
+                dashLi.onclick = () => { setActiveMenu(dashLi); loadDashboard(); };
                 menu.appendChild(dashLi);
-
-                // Separator
+                
                 const sep = document.createElement("li");
-                sep.textContent = "━━━━━━━━━━━━━━━━";
+                sep.textContent = "──────────";
                 sep.className = "menu-separator";
                 menu.appendChild(sep);
-
-                // Sheets
+                
                 sheets.forEach(sheet => {
                     const li = document.createElement("li");
                     li.textContent = `📄 ${sheet}`;
                     li.className = "menu-item";
-                    li.onclick = () => {
-                        setActiveMenu(li);
-                        loadSheet(sheet);
-                    };
+                    li.onclick = () => { setActiveMenu(li); loadSheet(sheet); };
                     menu.appendChild(li);
                 });
-
-                // Refresh button
-                const refreshLi = document.createElement("li");
-                refreshLi.textContent = "🔄 Refresh Menu";
-                refreshLi.className = "menu-item";
-                refreshLi.style.marginTop = "20px";
-                refreshLi.style.borderTop = "1px solid #1f1f1f";
-                refreshLi.style.paddingTop = "12px";
-                refreshLi.onclick = async () => {
-                    refreshLi.textContent = "🔄 Memuat...";
-                    await loadSidebar();
-                };
-                menu.appendChild(refreshLi);
                 
             } catch (error) {
-                console.error("Sidebar error:", error);
-                menu.innerHTML = `<li class="error">❌ Error: ${error.message}</li>`;
+                menu.innerHTML = `<li>❌ Error: ${error.message}</li>`;
             }
         }
 
-        function setActiveMenu(activeItem) {
-            document.querySelectorAll(".menu-item").forEach(item => {
-                item.classList.remove("active");
-            });
-            activeItem.classList.add("active");
+        function setActiveMenu(active) {
+            document.querySelectorAll(".menu-item").forEach(item => item.classList.remove("active"));
+            active.classList.add("active");
         }
 
         // ==================== DASHBOARD ====================
         async function loadDashboard() {
             const content = document.getElementById("content");
-            if (!content) return;
+            content.innerHTML = '<div class="card"><div class="loading-spinner"></div><h3>Memuat Dashboard...</h3></div>';
             
-            content.innerHTML = '<div class="card"><div class="loading-spinner"></div><h3>📊 Memuat Dashboard...</h3></div>';
+            document.getElementById("searchResults").innerHTML = "";
+            document.getElementById("searchInput").value = "";
             
-            // Clear search
-            const searchResults = document.getElementById("searchResults");
-            if (searchResults) searchResults.innerHTML = "";
-            const searchInput = document.getElementById("searchInput");
-            if (searchInput) searchInput.value = "";
-
             try {
                 const sheets = await getSheets();
-                
-                if (!sheets || sheets.length === 0) {
-                    content.innerHTML = `<div class="card error-card"><h3>⚠️ Tidak Ada Database</h3><p>Belum ada sheet yang tersedia.</p><button onclick="loadDashboard()" class="btn-primary">🔄 Refresh</button></div>`;
-                    return;
-                }
-                
-                // Get stats
                 const stats = [];
                 let totalItems = 0;
                 
                 for (const sheet of sheets) {
                     const data = await getSheetData(sheet);
-                    const count = data.length;
-                    stats.push({ name: sheet, count: count });
-                    totalItems += count;
+                    stats.push({ name: sheet, count: data.length });
+                    totalItems += data.length;
                 }
-
+                
                 let html = `
                     <div class="dashboard-welcome">
                         <h1>🏠 Creator Vault</h1>
-                        <p>Personal Knowledge Hub & Digital Library</p>
-                        <div class="last-updated">🕐 Last updated: ${new Date().toLocaleTimeString()}</div>
+                        <p>Personal Knowledge Hub</p>
+                        <div class="last-updated">🕐 ${new Date().toLocaleTimeString()}</div>
                     </div>
                     <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">${sheets.length}</div>
-                            <div class="stat-label">Database Categories</div>
-                            <div class="stat-icon">📁</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${totalItems}</div>
-                            <div class="stat-label">Total Items</div>
-                            <div class="stat-icon">📄</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">⚡</div>
-                            <div class="stat-label">Real-time Sync</div>
-                            <div class="stat-icon">🔄</div>
-                        </div>
+                        <div class="stat-card"><div class="stat-number">${sheets.length}</div><div class="stat-label">Database</div></div>
+                        <div class="stat-card"><div class="stat-number">${totalItems}</div><div class="stat-label">Total Items</div></div>
+                        <div class="stat-card"><div class="stat-number">⚡</div><div class="stat-label">Live Sync</div></div>
                     </div>
                     <div class="card">
                         <h3>📚 Semua Database</h3>
                         <div class="sheet-grid">
                 `;
-
-                for (const sheet of stats) {
-                    const icon = getSheetIcon(sheet.name);
+                
+                stats.forEach(s => {
                     html += `
-                        <div class="sheet-card" onclick="loadSheet('${escapeHtml(sheet.name)}')">
-                            <div class="sheet-icon">${icon}</div>
-                            <div class="sheet-name">${escapeHtml(sheet.name)}</div>
-                            <div class="sheet-count">📊 ${sheet.count} items</div>
-                            <div class="sheet-hover">Klik untuk lihat detail →</div>
+                        <div class="sheet-card" onclick="loadSheet('${s.name}')">
+                            <div class="sheet-icon">📄</div>
+                            <div class="sheet-name">${escapeHtml(s.name)}</div>
+                            <div class="sheet-count">${s.count} items</div>
                         </div>
                     `;
-                }
-
-                html += `
-                        </div>
-                    </div>
-                    <div class="card tips-card">
-                        <h3>💡 Panduan Cepat</h3>
-                        <ul>
-                            <li>🔍 Gunakan kotak search di atas untuk mencari ke semua database</li>
-                            <li>📄 Klik sheet di sidebar kiri atau di dashboard untuk melihat semua data</li>
-                            <li>👆 Klik baris tabel untuk melihat detail lengkap</li>
-                            <li>✨ Tambah sheet baru di Google Spreadsheet, otomatis muncul di sini</li>
-                        </ul>
-                    </div>
-                `;
-
-                content.innerHTML = html;
-                
-                // Update active menu
-                document.querySelectorAll(".menu-item").forEach(item => {
-                    if (item.textContent.includes("Dashboard")) {
-                        item.classList.add("active");
-                    } else {
-                        item.classList.remove("active");
-                    }
                 });
                 
+                html += `</div></div>`;
+                content.innerHTML = html;
+                
             } catch (error) {
-                console.error("Dashboard error:", error);
-                content.innerHTML = `<div class="card error-card"><h3>⚠️ Gagal Memuat Dashboard</h3><p>${error.message}</p><button onclick="loadDashboard()" class="btn-primary">🔄 Coba Lagi</button></div>`;
+                content.innerHTML = `<div class="card error-card"><h3>Error</h3><p>${error.message}</p><button onclick="loadDashboard()">Coba Lagi</button></div>`;
             }
-        }
-
-        function getSheetIcon(sheetName) {
-            const icons = {
-                "Ebook": "📚",
-                "Produk": "🛒",
-                "Pelanggan": "👥",
-                "TemplateChat": "💬",
-                "Affiliate": "🔗",
-                "PromptAI": "🤖",
-                "IdeKonten": "💡",
-                "Notes": "📝",
-                "ReadingProgress": "📖",
-                "Bookmarks": "🔖",
-                "Highlights": "✨"
-            };
-            return icons[sheetName] || "📄";
         }
 
         // ==================== SHEET VIEWER ====================
@@ -1151,26 +596,25 @@
             currentFilter = "";
             
             const content = document.getElementById("content");
-            content.innerHTML = '<div class="card"><div class="loading-spinner"></div><h3>📄 Memuat data...</h3><p>Mengambil data dari ' + escapeHtml(sheetName) + '...</p></div>';
+            content.innerHTML = '<div class="card"><div class="loading-spinner"></div><h3>📄 Memuat data...</h3></div>';
             
-            // Clear search
-            const searchResults = document.getElementById("searchResults");
-            if (searchResults) searchResults.innerHTML = "";
-            const searchInput = document.getElementById("searchInput");
-            if (searchInput) searchInput.value = "";
-
+            document.getElementById("searchResults").innerHTML = "";
+            document.getElementById("searchInput").value = "";
+            
             try {
                 const data = await getSheetData(sheetName);
                 currentData = data;
                 
                 if (data.length > 0) {
                     currentHeaders = Object.keys(data[0]);
+                    console.log(`Headers untuk ${sheetName}:`, currentHeaders);
+                } else {
+                    currentHeaders = [];
                 }
                 
                 renderSheetData();
             } catch (error) {
-                console.error("loadSheet error:", error);
-                content.innerHTML = `<div class="card error-card"><h3>⚠️ Error</h3><p>${error.message}</p><button onclick="loadDashboard()" class="btn-primary">← Kembali</button></div>`;
+                content.innerHTML = `<div class="card error-card"><h3>Error</h3><p>${error.message}</p><button onclick="loadDashboard()">Kembali</button></div>`;
             }
         }
 
@@ -1179,44 +623,41 @@
             
             if (!currentData || currentData.length === 0) {
                 content.innerHTML = `
-                    <div class="card empty-sheet">
-                        <div class="empty-icon">📭</div>
+                    <div class="card">
                         <h2>📄 ${escapeHtml(currentSheet)}</h2>
                         <p>Tidak ada data di sheet ini.</p>
-                        <p class="text-muted">Silakan tambahkan data di Google Spreadsheet.</p>
-                        <button onclick="loadDashboard()" class="btn-primary">← Kembali ke Dashboard</button>
+                        <button onclick="loadDashboard()" class="btn-primary">← Kembali</button>
                     </div>
                 `;
                 return;
             }
-
-            // Apply filter
+            
+            // Filter
             let filteredData = [...currentData];
             if (currentFilter) {
                 filteredData = currentData.filter(row => 
                     JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
                 );
             }
-
+            
             const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
             const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
             const pageData = filteredData.slice(startIdx, startIdx + ITEMS_PER_PAGE);
-
+            
             let html = `
                 <div class="sheet-header">
                     <div>
                         <h2>📄 ${escapeHtml(currentSheet)}</h2>
-                        <div class="sheet-stats">📊 ${filteredData.length} item ditemukan ${currentFilter ? `(filter: "${escapeHtml(currentFilter)}")` : ""}</div>
+                        <div class="sheet-stats">📊 ${filteredData.length} item ditemukan</div>
                     </div>
-                    <div class="sheet-actions">
+                    <div>
                         <button onclick="loadDashboard()" class="btn-secondary">← Dashboard</button>
-                        <button onclick="exportSheetData()" class="btn-secondary">📥 Export CSV</button>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="filter-bar">
-                        <input type="text" id="sheetFilter" placeholder="🔍 Filter data di sheet ini..." 
+                        <input type="text" id="sheetFilter" placeholder="🔍 Filter data..." 
                                value="${escapeHtml(currentFilter)}" onkeyup="filterSheetData(event)">
                         ${currentFilter ? `<button onclick="clearFilter()" class="btn-small">✖ Clear</button>` : ""}
                     </div>
@@ -1225,44 +666,44 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    ${currentHeaders.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
-                                    <th style="width:80px">Aksi</th>
+                                    ${currentHeaders.map(h => `<th>${escapeHtml(h)}</th>`).join('')}
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
             `;
-
+            
             pageData.forEach((row, idx) => {
-                html += `<tr onclick="showDetail(${startIdx + idx})" style="cursor: pointer;">`;
-                currentHeaders.forEach(col => {
-                    let val = row[col] || "";
-                    val = val.length > 50 ? val.substring(0, 50) + "..." : val;
-                    html += `<td title="${escapeHtml(row[col] || "")}">${escapeHtml(val)}</td>`;
+                const actualIdx = startIdx + idx;
+                html += `<tr onclick="showDetail(${actualIdx})" style="cursor:pointer;">`;
+                currentHeaders.forEach(h => {
+                    let val = row[h] || "";
+                    val = val.length > 40 ? val.substring(0, 40) + "..." : val;
+                    html += `<td title="${escapeHtml(row[h] || "")}">${escapeHtml(val)}</td>`;
                 });
-                html += `<td><button class="btn-small" onclick="event.stopPropagation(); showDetail(${startIdx + idx})">👁️ Detail</button></td>`;
+                html += `<td><button class="btn-small" onclick="event.stopPropagation(); showDetail(${actualIdx})">Detail</button></td>`;
                 html += `</tr>`;
             });
-
+            
             html += `
                             </tbody>
                         </table>
                     </div>
             `;
-
+            
             if (totalPages > 1) {
                 html += `
                     <div class="pagination">
-                        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>◀ Sebelumnya</button>
-                        <span>Halaman ${currentPage} dari ${totalPages}</span>
-                        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Berikutnya ▶</button>
+                        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>◀ Prev</button>
+                        <span>Page ${currentPage} of ${totalPages}</span>
+                        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Next ▶</button>
                     </div>
                 `;
             }
-
+            
             html += `</div>`;
             content.innerHTML = html;
             
-            // Focus filter input
             const filterInput = document.getElementById("sheetFilter");
             if (filterInput) filterInput.focus();
         }
@@ -1293,253 +734,138 @@
             }
             const item = filteredData[index];
             if (!item) return;
-
-            const content = document.getElementById("content");
             
-            let detailsHtml = `
+            let html = `
                 <div class="card detail-card">
                     <div class="detail-header">
-                        <h2>📋 Detail Item - ${escapeHtml(currentSheet)}</h2>
+                        <h2>📋 Detail - ${escapeHtml(currentSheet)}</h2>
                         <button class="btn-close" onclick="loadSheet('${currentSheet}')">✖ Kembali</button>
                     </div>
                     <div class="detail-body">
             `;
-
-            for (const [key, value] of Object.entries(item)) {
-                detailsHtml += `
+            
+            for (const [key, val] of Object.entries(item)) {
+                html += `
                     <div class="detail-row">
                         <div class="detail-label">${escapeHtml(key)}</div>
                         <div class="detail-value">
-                            ${isUrl(value) ? `<a href="${value}" target="_blank" rel="noopener">${escapeHtml(value)}</a>` : 
-                              value ? `<pre>${escapeHtml(String(value))}</pre>` : '-'}
+                            ${isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : 
+                              val ? `<pre>${escapeHtml(String(val))}</pre>` : '-'}
                         </div>
                     </div>
                 `;
             }
-
-            detailsHtml += `
+            
+            html += `
                     </div>
                     <div class="detail-footer">
-                        <button onclick="loadSheet('${currentSheet}')" class="btn-primary">📄 Lihat semua di ${escapeHtml(currentSheet)}</button>
+                        <button onclick="loadSheet('${currentSheet}')" class="btn-primary">← Kembali ke daftar</button>
                     </div>
                 </div>
             `;
-
-            content.innerHTML = detailsHtml;
-        }
-
-        function exportSheetData() {
-            if (!currentData || currentData.length === 0) {
-                alert("Tidak ada data untuk diexport");
-                return;
-            }
             
-            const headers = currentHeaders;
-            const rows = currentData.map(row => headers.map(h => {
-                let val = row[h] || "";
-                val = String(val).replace(/,/g, " ").replace(/"/g, '""');
-                return `"${val}"`;
-            }));
-            const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-            
-            const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${currentSheet}_export.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
+            document.getElementById("content").innerHTML = html;
         }
 
         // ==================== SEARCH ====================
         let searchTimeout;
-
+        
         function initSearch() {
             const input = document.getElementById("searchInput");
-            if (!input) return;
-            
             input.addEventListener("input", async () => {
                 clearTimeout(searchTimeout);
                 const keyword = input.value.trim();
-
                 if (keyword.length < 2) {
-                    const resultsDiv = document.getElementById("searchResults");
-                    if (resultsDiv) resultsDiv.innerHTML = "";
+                    document.getElementById("searchResults").innerHTML = "";
                     return;
                 }
-
                 searchTimeout = setTimeout(async () => {
-                    await performSearch(keyword);
+                    const resultsDiv = document.getElementById("searchResults");
+                    resultsDiv.innerHTML = '<div class="card">🔍 Mencari...</div>';
+                    try {
+                        const data = await searchData(keyword);
+                        if (!data.length) {
+                            resultsDiv.innerHTML = `<div class="card">Tidak ada hasil untuk "${escapeHtml(keyword)}"</div>`;
+                            return;
+                        }
+                        
+                        const grouped = {};
+                        data.forEach(item => {
+                            const sheet = item.sheet || "Unknown";
+                            if (!grouped[sheet]) grouped[sheet] = [];
+                            grouped[sheet].push(item);
+                        });
+                        
+                        let html = `<div class="card"><h3>🔍 Hasil: "${escapeHtml(keyword)}"</h3><p>${data.length} ditemukan</p></div>`;
+                        for (const [sheet, items] of Object.entries(grouped)) {
+                            html += `<div class="card"><div class="search-sheet-header" onclick="loadSheet('${sheet}')">📄 ${sheet} <span class="badge">${items.length}</span></div>`;
+                            items.slice(0, 5).forEach((item, idx) => {
+                                const title = item.title || item.judul || item.nama || "Tanpa judul";
+                                html += `<div class="search-item" onclick="showSearchDetail('${sheet}', ${idx})">📌 ${escapeHtml(String(title).substring(0, 80))}</div>`;
+                            });
+                            if (items.length > 5) {
+                                html += `<div class="search-more" onclick="loadSheet('${sheet}')">+ ${items.length-5} hasil lainnya</div>`;
+                            }
+                            html += `</div>`;
+                        }
+                        resultsDiv.innerHTML = html;
+                        lastSearchData = data;
+                    } catch(e) {
+                        resultsDiv.innerHTML = `<div class="card">Error: ${e.message}</div>`;
+                    }
                 }, 400);
             });
         }
-
-        async function performSearch(keyword) {
-            const resultsDiv = document.getElementById("searchResults");
-            if (!resultsDiv) return;
-            
-            resultsDiv.innerHTML = '<div class="card"><div class="loading-spinner-small"></div> 🔍 Mencari...</div>';
-
-            try {
-                const data = await searchData(keyword);
-                
-                if (!data || data.length === 0) {
-                    resultsDiv.innerHTML = `<div class="card empty-search"><div class="empty-icon">🔍</div><p>Tidak ada hasil untuk "<strong>${escapeHtml(keyword)}</strong>"</p></div>`;
-                    return;
-                }
-
-                // Group by sheet
-                const grouped = {};
-                data.forEach(item => {
-                    const sheet = item.sheet || "Unknown";
-                    if (!grouped[sheet]) grouped[sheet] = [];
-                    grouped[sheet].push(item);
-                });
-
-                let html = `
-                    <div class="search-header">
-                        <div class="search-stats">
-                            <span class="search-icon">🔍</span>
-                            <span class="search-keyword">"${escapeHtml(keyword)}"</span>
-                            <span class="search-count">${data.length} hasil dari ${Object.keys(grouped).length} kategori</span>
-                        </div>
-                        <button onclick="clearSearch()" class="btn-small">✖ Tutup</button>
-                    </div>
-                `;
-
-                for (const [sheet, items] of Object.entries(grouped)) {
-                    html += `
-                        <div class="card search-group">
-                            <div class="search-sheet-header" onclick="loadSheet('${sheet}')">
-                                <span>📄 ${escapeHtml(sheet)}</span>
-                                <span class="badge">${items.length}</span>
-                            </div>
-                            <div class="search-items">
-                    `;
-
-                    items.slice(0, 5).forEach((item, idx) => {
-                        const title = item.title || item.judul || item.nama || Object.values(item)[0] || "Tanpa judul";
-                        html += `
-                            <div class="search-item" onclick="showSearchDetail('${sheet}', ${idx})">
-                                <div class="search-item-title">📌 ${escapeHtml(String(title).substring(0, 80))}</div>
-                            </div>
-                        `;
-                    });
-
-                    if (items.length > 5) {
-                        html += `<div class="search-more" onclick="loadSheet('${sheet}')">+ ${items.length - 5} hasil lainnya di ${escapeHtml(sheet)}</div>`;
-                    }
-
-                    html += `</div></div>`;
-                }
-
-                resultsDiv.innerHTML = html;
-                lastSearchData = data;
-                
-            } catch (error) {
-                console.error("Search error:", error);
-                resultsDiv.innerHTML = `<div class="card error-card"><p>❌ Gagal mencari: ${error.message}</p></div>`;
-            }
-        }
-
+        
         function showSearchDetail(sheet, idx) {
             if (!lastSearchData) return;
-            
             const sheetItems = lastSearchData.filter(item => item.sheet === sheet);
             const item = sheetItems[idx];
             if (!item) return;
-
-            const content = document.getElementById("content");
             
-            let detailsHtml = `
+            let html = `
                 <div class="card detail-card">
                     <div class="detail-header">
                         <h2>📋 Detail dari ${escapeHtml(sheet)}</h2>
-                        <button class="btn-close" onclick="clearSearchAndReload()">✖ Tutup</button>
+                        <button class="btn-close" onclick="loadDashboard()">✖ Tutup</button>
                     </div>
                     <div class="detail-body">
             `;
-
-            for (const [key, value] of Object.entries(item)) {
+            for (const [key, val] of Object.entries(item)) {
                 if (key === 'sheet') continue;
-                detailsHtml += `
-                    <div class="detail-row">
-                        <div class="detail-label">${escapeHtml(key)}</div>
-                        <div class="detail-value">
-                            ${isUrl(value) ? `<a href="${value}" target="_blank">${escapeHtml(value)}</a>` : 
-                              value ? `<pre>${escapeHtml(String(value))}</pre>` : '-'}
-                        </div>
-                    </div>
-                `;
+                html += `<div class="detail-row"><div class="detail-label">${escapeHtml(key)}</div><div class="detail-value">${isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : val ? `<pre>${escapeHtml(String(val))}</pre>` : '-'}</div></div>`;
             }
-
-            detailsHtml += `
-                    </div>
-                    <div class="detail-footer">
-                        <button onclick="loadSheet('${sheet}')" class="btn-primary">📄 Lihat semua di ${escapeHtml(sheet)}</button>
-                    </div>
-                </div>
-            `;
-
-            content.innerHTML = detailsHtml;
-            
-            // Clear search
-            const searchResults = document.getElementById("searchResults");
-            if (searchResults) searchResults.innerHTML = "";
-            const searchInput = document.getElementById("searchInput");
-            if (searchInput) searchInput.value = "";
-        }
-
-        function clearSearch() {
-            const searchResults = document.getElementById("searchResults");
-            if (searchResults) searchResults.innerHTML = "";
-            const searchInput = document.getElementById("searchInput");
-            if (searchInput) searchInput.value = "";
-            lastSearchData = null;
-        }
-
-        function clearSearchAndReload() {
-            clearSearch();
-            loadDashboard();
+            html += `</div><div class="detail-footer"><button onclick="loadSheet('${sheet}')" class="btn-primary">📄 Lihat semua di ${sheet}</button></div></div>`;
+            document.getElementById("content").innerHTML = html;
+            document.getElementById("searchResults").innerHTML = "";
+            document.getElementById("searchInput").value = "";
         }
 
         // ==================== UTILITIES ====================
         function isUrl(str) {
             if (!str || typeof str !== 'string') return false;
-            return str.startsWith('http://') || str.startsWith('https://') || 
-                   str.includes('drive.google.com') || str.includes('docs.google.com');
+            return str.startsWith('http://') || str.startsWith('https://');
         }
-
+        
         function escapeHtml(str) {
             if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        // ==================== INITIALIZATION ====================
+        // ==================== INIT ====================
         window.loadDashboard = loadDashboard;
         window.loadSheet = loadSheet;
         window.showDetail = showDetail;
         window.changePage = changePage;
-        window.showSearchDetail = showSearchDetail;
-        window.clearSearch = clearSearch;
-        window.clearSearchAndReload = clearSearchAndReload;
         window.filterSheetData = filterSheetData;
         window.clearFilter = clearFilter;
-        window.exportSheetData = exportSheetData;
-
+        
         async function init() {
-            console.log("🚀 Initializing Creator Vault...");
             await loadSidebar();
             await loadDashboard();
             initSearch();
-            console.log("✅ Creator Vault ready!");
         }
-
+        
         init();
     </script>
 </body>
