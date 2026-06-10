@@ -2,11 +2,13 @@ let currentSheet = null;
 let currentPage = 1;
 let currentData = [];
 let currentHeaders = [];
+let currentFilter = "";
 const itemsPerPage = 20;
 
 async function loadSheet(sheetName) {
     currentSheet = sheetName;
     currentPage = 1;
+    currentFilter = "";
     showLoading();
 
     try {
@@ -18,6 +20,13 @@ async function loadSheet(sheetName) {
         }
         
         renderSheetData();
+        
+        // Clear search
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) searchInput.value = "";
+        const searchResults = document.getElementById("searchResults");
+        if (searchResults) searchResults.innerHTML = "";
+        
     } catch (error) {
         console.error("Error loading sheet:", error);
         showError(`Gagal memuat data ${sheetName}: ${error.message}`);
@@ -29,34 +38,55 @@ function renderSheetData() {
     
     if (!currentData || currentData.length === 0) {
         content.innerHTML = `
-            <div class="card">
+            <div class="card empty-sheet">
+                <div class="empty-icon">📭</div>
                 <h2>📄 ${escapeHtml(currentSheet)}</h2>
                 <p>Tidak ada data di sheet ini.</p>
                 <p class="text-muted">Silakan tambahkan data di Google Spreadsheet.</p>
-                <button onclick="loadDashboard()" class="btn-primary" style="margin-top:16px;">← Kembali ke Dashboard</button>
+                <button onclick="loadDashboard()" class="btn-primary">← Kembali ke Dashboard</button>
             </div>
         `;
         return;
     }
 
-    const totalPages = Math.ceil(currentData.length / itemsPerPage);
+    // Apply filter if any
+    let filteredData = [...currentData];
+    if (currentFilter) {
+        filteredData = currentData.filter(row => 
+            JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
+        );
+    }
+
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const startIdx = (currentPage - 1) * itemsPerPage;
     const endIdx = startIdx + itemsPerPage;
-    const pageData = currentData.slice(startIdx, endIdx);
+    const pageData = filteredData.slice(startIdx, endIdx);
 
     let html = `
         <div class="sheet-header">
-            <h2>📄 ${escapeHtml(currentSheet)}</h2>
-            <div class="sheet-stats">📊 ${currentData.length} item ditemukan</div>
+            <div>
+                <h2>📄 ${escapeHtml(currentSheet)}</h2>
+                <div class="sheet-stats">📊 ${filteredData.length} item ditemukan ${currentFilter ? `(filter: "${currentFilter}")` : ""}</div>
+            </div>
+            <div class="sheet-actions">
+                <button onclick="loadDashboard()" class="btn-secondary">← Dashboard</button>
+                <button onclick="exportSheetData()" class="btn-secondary">📥 Export</button>
+            </div>
         </div>
-
+        
         <div class="card">
+            <div class="filter-bar">
+                <input type="text" id="sheetFilter" placeholder="🔍 Filter data di sheet ini..." 
+                       value="${escapeHtml(currentFilter)}" onkeyup="filterSheetData(event)">
+                ${currentFilter ? `<button onclick="clearFilter()" class="btn-small">✖ Clear</button>` : ""}
+            </div>
+            
             <div class="table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
                             ${currentHeaders.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
-                            <th>Aksi</th>
+                            <th style="width:80px">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -78,11 +108,15 @@ function renderSheetData() {
 
     html += `</div>`;
     content.innerHTML = html;
+    
+    // Focus on filter input if exists
+    const filterInput = document.getElementById("sheetFilter");
+    if (filterInput) filterInput.focus();
 }
 
 function renderTableRow(row, index) {
     return `
-        <tr onclick="showDetail(${index})">
+        <tr onclick="showDetail(${index})" style="cursor: pointer;">
             ${currentHeaders.map(col => {
                 const value = row[col] || '';
                 const truncated = value.length > 50 ? value.substring(0, 50) + '...' : value;
@@ -95,13 +129,32 @@ function renderTableRow(row, index) {
     `;
 }
 
+function filterSheetData(event) {
+    currentFilter = event.target.value;
+    currentPage = 1;
+    renderSheetData();
+}
+
+function clearFilter() {
+    currentFilter = "";
+    currentPage = 1;
+    renderSheetData();
+}
+
 function changePage(delta) {
     currentPage += delta;
     renderSheetData();
 }
 
 function showDetail(index) {
-    const item = currentData[index];
+    // Apply filter to get correct index
+    let filteredData = [...currentData];
+    if (currentFilter) {
+        filteredData = currentData.filter(row => 
+            JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
+        );
+    }
+    const item = filteredData[index];
     if (!item) return;
 
     const content = document.getElementById("content");
@@ -116,7 +169,6 @@ function showDetail(index) {
     `;
 
     for (const [key, value] of Object.entries(item)) {
-        if (key === '_rowData') continue;
         detailsHtml += `
             <div class="detail-row">
                 <div class="detail-label">${escapeHtml(key)}</div>
@@ -137,15 +189,34 @@ function showDetail(index) {
     `;
 
     content.innerHTML = detailsHtml;
-    // Clear search results if any
-    const searchResults = document.getElementById("searchResults");
-    if (searchResults) searchResults.innerHTML = "";
+}
+
+function exportSheetData() {
+    if (!currentData || currentData.length === 0) {
+        alert("Tidak ada data untuk diexport");
+        return;
+    }
+    
+    // Convert to CSV
+    const headers = currentHeaders;
+    const rows = currentData.map(row => headers.map(h => JSON.stringify(row[h] || "").replace(/,/g, " ")));
+    const csv = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    
+    // Download
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${currentSheet}_export.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 function isUrl(str) {
     if (!str || typeof str !== 'string') return false;
     return str.startsWith('http://') || str.startsWith('https://') || 
-           str.includes('drive.google.com') || str.includes('docs.google.com');
+           str.includes('drive.google.com') || str.includes('docs.google.com') ||
+           str.includes('youtube.com') || str.includes('youtu.be');
 }
 
 function escapeHtml(str) {
@@ -160,7 +231,13 @@ function escapeHtml(str) {
 
 function showLoading() {
     const content = document.getElementById("content");
-    content.innerHTML = `<div class="card"><h3>🔄 Memuat data...</h3><p>Mengambil data dari Google Sheets...</p></div>`;
+    content.innerHTML = `
+        <div class="card loading-card">
+            <div class="loading-spinner"></div>
+            <h3>🔄 Memuat data...</h3>
+            <p>Mengambil data dari Google Sheets...</p>
+        </div>
+    `;
 }
 
 function showError(message) {
@@ -168,8 +245,9 @@ function showError(message) {
     content.innerHTML = `
         <div class="card error-card">
             <h3>⚠️ Error</h3>
-            <p>${message}</p>
-            <button onclick="loadDashboard()" class="btn-primary" style="margin-top:16px;">🔄 Kembali ke Dashboard</button>
+            <p>${escapeHtml(message)}</p>
+            <button onclick="loadDashboard()" class="btn-primary">← Kembali ke Dashboard</button>
+            <button onclick="loadSheet('${currentSheet}')" class="btn-secondary">🔄 Coba Lagi</button>
         </div>
     `;
 }
