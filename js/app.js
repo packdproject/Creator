@@ -1,18 +1,16 @@
-async function initApp(){
-
+async function initApp() {
   await loadSidebar();
-
   await loadDashboard();
-
+  initSearch();
 }
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+// Global functions for HTML onclick
+window.changePage = changePage;
+window.showDetail = showDetail;
+window.loadSheet = loadSheet;
+window.loadDashboard = loadDashboard;
+window.showSearchDetail = showSearchDetail;
 
-    initApp();
-
-    initSearch();
-
-  }
-);
+document.addEventListener("DOMContentLoaded", () => {
+  initApp();
+});
