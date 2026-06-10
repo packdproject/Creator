@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Creator Vault - Personal Knowledge Hub</title>
+    <title>Creator Vault - Digital Library</title>
     <style>
         /* ========================================
-           CREATOR VAULT - MODERN DARK THEME
+           MODERN GLASSMORPHISM THEME
            ======================================== */
         
         * {
@@ -16,64 +16,120 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f5f7fb;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #1a1a2e;
-            line-height: 1.5;
-        }
-
-        /* App Layout */
-        .app {
-            display: flex;
             min-height: 100vh;
         }
 
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            padding: 24px 16px;
-            position: fixed;
+        /* Glassmorphism Container */
+        .app {
+            min-height: 100vh;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(0px);
+        }
+
+        /* Navbar Modern */
+        .navbar {
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            padding: 16px 24px;
+            position: sticky;
             top: 0;
-            left: 0;
-            bottom: 0;
-            overflow-y: auto;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .logo {
             font-size: 24px;
             font-weight: 800;
-            margin-bottom: 32px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .logo::before {
-            content: "🏦";
+        .logo span {
             font-size: 28px;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 12px;
+            background: #f0f0f0;
+        }
+
+        /* Sidebar Drawer */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 2px 0 20px rgba(0,0,0,0.2);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-sidebar {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: white;
         }
 
         .menu {
             list-style: none;
+            padding: 16px;
         }
 
         .menu-item {
             padding: 12px 16px;
             border-radius: 12px;
             cursor: pointer;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-size: 14px;
             font-weight: 500;
         }
 
@@ -82,39 +138,10 @@
         }
 
         .menu-item.active {
-            background: linear-gradient(135deg, #4a9eff, #2a6fcc);
-            box-shadow: 0 4px 12px rgba(74,158,255,0.3);
+            background: linear-gradient(135deg, #667eea, #764ba2);
         }
 
-        .menu-separator {
-            padding: 8px 16px;
-            font-size: 11px;
-            color: rgba(255,255,255,0.3);
-            letter-spacing: 1px;
-            margin: 8px 0;
-        }
-
-        /* Mobile Menu Button */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 16px;
-            left: 16px;
-            z-index: 1100;
-            background: #1a1a2e;
-            border: none;
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            color: white;
-        }
-
-        /* Overlay for mobile */
-        .sidebar-overlay {
-            display: none;
+        .overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -122,139 +149,137 @@
             bottom: 0;
             background: rgba(0,0,0,0.5);
             z-index: 999;
+            display: none;
         }
 
-        /* ===== MAIN CONTENT ===== */
+        .overlay.active {
+            display: block;
+        }
+
+        /* Main Content */
         .main {
-            flex: 1;
-            margin-left: 280px;
-            padding: 24px 32px;
-            min-height: 100vh;
-            background: #f5f7fb;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
         }
 
-        /* Header */
-        .header {
-            margin-bottom: 28px;
-        }
-
-        .header h1 {
-            font-size: 32px;
-            font-weight: 800;
-            background: linear-gradient(135deg, #1a1a2e, #4a9eff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 14px;
-            margin-top: 6px;
-        }
-
-        /* Search Box */
-        .search-wrapper {
-            position: relative;
+        /* Search Section */
+        .search-section {
+            background: white;
+            border-radius: 24px;
+            padding: 20px 24px;
             margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
         .search-box {
             width: 100%;
             padding: 16px 20px;
-            border: 2px solid #e0e4e8;
+            border: 2px solid #eef2f6;
             border-radius: 16px;
-            background: white;
             font-size: 15px;
             transition: all 0.2s;
         }
 
         .search-box:focus {
             outline: none;
-            border-color: #4a9eff;
-            box-shadow: 0 0 0 3px rgba(74,158,255,0.2);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
 
-        /* Cards */
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #eef2f6;
-        }
-
-        /* Dashboard Stats */
+        /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background: white;
             border-radius: 20px;
-            padding: 24px;
+            padding: 20px;
             text-align: center;
-            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
         }
 
         .stat-number {
-            font-size: 44px;
+            font-size: 36px;
             font-weight: 800;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            opacity: 0.8;
-            margin-top: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
         /* Sheet Grid */
         .sheet-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 16px;
             margin-top: 16px;
         }
 
         .sheet-card {
-            background: #f8f9fc;
+            background: white;
             border-radius: 16px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #eef2f6;
         }
 
         .sheet-card:hover {
-            transform: translateY(-3px);
-            border-color: #4a9eff;
-            box-shadow: 0 8px 20px rgba(74,158,255,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.15);
+            border-color: #667eea;
         }
 
         .sheet-icon {
-            font-size: 36px;
+            font-size: 32px;
             margin-bottom: 12px;
         }
 
         .sheet-name {
             font-weight: 700;
-            font-size: 16px;
-            color: #1a1a2e;
+            font-size: 15px;
         }
 
         .sheet-count {
             font-size: 12px;
-            color: #4a9eff;
+            color: #667eea;
             margin-top: 6px;
         }
 
         /* Table Styles */
-        .table-responsive {
-            overflow-x: auto;
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eef2f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-input {
+            padding: 8px 16px;
+            border: 1px solid #e0e4e8;
+            border-radius: 40px;
+            width: 250px;
         }
 
         .data-table {
@@ -264,79 +289,123 @@
 
         .data-table th,
         .data-table td {
-            padding: 14px 12px;
+            padding: 14px 16px;
             text-align: left;
             border-bottom: 1px solid #eef2f6;
         }
 
         .data-table th {
-            background: #f8f9fc;
+            background: #fafbfc;
             font-weight: 600;
             color: #1a1a2e;
-            position: sticky;
-            top: 0;
+        }
+
+        .data-table tbody tr {
+            cursor: pointer;
+            transition: background 0.15s;
         }
 
         .data-table tbody tr:hover {
             background: #f8f9fc;
-            cursor: pointer;
         }
 
         /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-top: 24px;
-            padding-top: 16px;
+            gap: 8px;
+            padding: 20px;
             border-top: 1px solid #eef2f6;
         }
 
-        .pagination button {
-            background: #f0f2f5;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid #e0e4e8;
+            background: white;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: 500;
             transition: all 0.2s;
         }
 
-        .pagination button:hover:not(:disabled) {
-            background: #4a9eff;
+        .page-btn:hover {
+            background: #667eea;
             color: white;
+            border-color: #667eea;
         }
 
-        .pagination button:disabled {
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .page-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        /* Detail View */
-        .detail-header {
+        /* Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eef2f6;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid #eef2f6;
         }
 
-        .detail-body {
-            max-height: 60vh;
-            overflow-y: auto;
+        .modal-body {
+            padding: 20px 24px;
         }
 
         .detail-row {
             display: flex;
-            padding: 12px 0;
-            border-bottom: 1px solid #eef2f6;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
         }
 
         .detail-label {
-            width: 180px;
+            width: 140px;
             font-weight: 600;
-            color: #4a9eff;
+            color: #667eea;
         }
 
         .detail-value {
@@ -344,199 +413,100 @@
             word-break: break-word;
         }
 
-        .detail-value pre {
-            background: #f8f9fc;
-            padding: 10px;
-            border-radius: 10px;
-            overflow-x: auto;
-            font-size: 13px;
-        }
-
-        .detail-footer {
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 2px solid #eef2f6;
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #eef2f6;
             text-align: right;
         }
 
         /* Search Results */
-        .search-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .search-results {
+            margin-top: 16px;
+        }
+
+        .result-group {
+            background: white;
+            border-radius: 16px;
             margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 12px;
+            overflow: hidden;
         }
 
-        .search-group {
-            margin-bottom: 20px;
-        }
-
-        .search-sheet-header {
-            font-weight: 700;
-            padding: 12px 16px;
+        .result-group-header {
+            padding: 14px 20px;
             background: #f8f9fc;
-            border-radius: 12px;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
         }
 
-        .badge {
-            background: #4a9eff;
-            color: white;
-            padding: 2px 12px;
-            border-radius: 30px;
-            font-size: 11px;
-        }
-
-        .search-item {
-            padding: 14px 16px;
+        .result-item {
+            padding: 14px 20px;
             border-bottom: 1px solid #eef2f6;
             cursor: pointer;
-            transition: background 0.2s;
-            border-radius: 12px;
+            transition: background 0.15s;
         }
 
-        .search-item:hover {
+        .result-item:hover {
             background: #f8f9fc;
         }
 
-        .search-item-title {
-            font-weight: 600;
-            margin-bottom: 4px;
+        /* Loading Skeleton */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
         }
 
-        .search-more {
-            padding: 10px 16px;
-            text-align: center;
-            color: #4a9eff;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        /* Filter Bar */
-        .filter-bar {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-bar input {
-            flex: 1;
-            padding: 10px 16px;
-            border: 1px solid #e0e4e8;
-            border-radius: 40px;
-            font-size: 13px;
-        }
-
-        .filter-bar input:focus {
-            outline: none;
-            border-color: #4a9eff;
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         /* Buttons */
         .btn-primary {
-            background: #4a9eff;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
-            padding: 8px 20px;
+            padding: 10px 24px;
             border-radius: 40px;
             color: white;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        .btn-secondary {
-            background: #f0f2f5;
-            border: none;
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #e0e4e8;
             padding: 8px 20px;
             border-radius: 40px;
             cursor: pointer;
-            font-weight: 500;
         }
 
-        .btn-small {
-            background: #f0f2f5;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        /* Loading & Error */
-        .loading-spinner {
+        /* Loading Spinner */
+        .spinner {
             width: 40px;
             height: 40px;
-            margin: 20px auto;
-            border: 3px solid #e0e4e8;
-            border-top: 3px solid #4a9eff;
+            border: 3px solid #eef2f6;
+            border-top: 3px solid #667eea;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
+            margin: 20px auto;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .error-card {
-            text-align: center;
-            padding: 48px;
-        }
-
-        .tips-card ul {
-            margin-left: 20px;
-            margin-top: 12px;
-        }
-
-        .tips-card li {
-            margin: 8px 0;
-            color: #555;
-        }
-
-        .text-muted {
-            color: #888;
-            font-size: 12px;
-        }
-
-        .sheet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        /* ===== RESPONSIVE ===== */
+        /* Responsive */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .mobile-menu-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .main {
-                margin-left: 0;
-                padding: 80px 16px 24px;
-            }
-
-            .sidebar-overlay.active {
+            .menu-toggle {
                 display: block;
+            }
+
+            .navbar-content {
+                flex-direction: row;
             }
 
             .stats-grid {
@@ -547,6 +517,24 @@
                 grid-template-columns: 1fr;
             }
 
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-input {
+                width: 100%;
+            }
+
+            .data-table {
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 8px;
+            }
+
             .detail-row {
                 flex-direction: column;
             }
@@ -555,640 +543,674 @@
                 width: 100%;
                 margin-bottom: 4px;
             }
-
-            .sheet-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
         }
 
-        @media (min-width: 769px) and (max-width: 1024px) {
+        @media (min-width: 769px) {
             .sidebar {
-                width: 260px;
+                position: relative;
+                left: 0;
+                width: 280px;
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .menu-toggle,
+            .close-sidebar,
+            .overlay {
+                display: none;
+            }
+            
+            .app {
+                display: flex;
             }
             
             .main {
-                margin-left: 260px;
-                padding: 24px;
-            }
-
-            .sheet-grid {
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                flex: 1;
             }
         }
 
-        /* Utility */
-        .text-center { text-align: center; }
-        .mt-2 { margin-top: 8px; }
-        .mt-3 { margin-top: 12px; }
-        .mb-2 { margin-bottom: 8px; }
-        .mb-3 { margin-bottom: 12px; }
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1a1a2e;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="app">
+    <!-- Sidebar Desktop -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span>🏦 Creator Vault</span>
+            <button class="close-sidebar" id="closeSidebar">✕</button>
+        </div>
+        <ul class="menu" id="sidebarMenu">
+            <li class="menu-item">📊 Dashboard</li>
+        </ul>
+    </aside>
 
-    <div class="app">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="logo">Creator Vault</div>
-            <ul class="menu" id="sidebarMenu">
-                <li>Memuat menu...</li>
-            </ul>
-        </aside>
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay"></div>
 
-        <!-- Main Content -->
-        <main class="main">
-            <div class="header">
-                <h1>Creator Vault</h1>
-                <p>Personal Knowledge Hub & Digital Library</p>
-            </div>
-
-            <!-- Search -->
-            <div class="search-wrapper">
-                <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari ebook, produk, prompt, affiliate... (min 2 karakter)">
-            </div>
-
-            <!-- Search Results -->
-            <div id="searchResults"></div>
-
-            <!-- Dynamic Content -->
-            <div id="content">
-                <div class="card text-center">
-                    <div class="loading-spinner"></div>
-                    <p>Memuat Dashboard...</p>
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="navbar-content">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <div class="logo">
+                    <span>🏦</span>
+                    Creator Vault
                 </div>
+                <div></div>
             </div>
-        </main>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari ebook, produk, prompt, affiliate... (min 2 karakter)">
+            <div id="searchResults"></div>
+        </div>
+
+        <!-- Dynamic Content -->
+        <div id="content">
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal" id="detailModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Detail Item</h3>
+            <button class="btn-outline" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+            <button class="btn-primary" id="modalAction">Lihat Semua</button>
+        </div>
     </div>
+</div>
 
-    <script>
-        // ========================================
-        // CONFIGURATION
-        // ========================================
-        const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5UL0HyAYtMz7MWb5kQoqmJM1PIDG1RA64AxArCAqQLs_IG/exec";
-        const ITEMS_PER_PAGE = 20;
+<script>
+    // ========================================
+    // CONFIGURATION
+    // ========================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5UL0HyAYtMz7MWb5kQoqmJM1PIDG1RA64AxArCAqQLs_IG/exec";
+    const CACHE_KEY = "creator_vault_cache";
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-        // Global variables
-        let currentSheet = null;
-        let currentData = [];
-        let currentHeaders = [];
-        let currentPage = 1;
-        let currentFilter = "";
-        let lastSearchData = [];
+    // Global state
+    let currentSheet = null;
+    let currentData = [];
+    let currentHeaders = [];
+    let currentPage = 1;
+    let currentFilter = "";
+    let sheetsList = [];
+    let sheetsCache = {};
+    let itemsPerPage = 15;
+    let lastSearchData = [];
 
-        // ========================================
-        // API FUNCTIONS
-        // ========================================
-        async function getSheets() {
-            try {
-                const res = await fetch(`${API_URL}?action=sheets`);
-                const data = await res.json();
-                console.log("Sheets:", data);
-                if (Array.isArray(data)) return data;
-                if (data && Array.isArray(data.sheets)) return data.sheets;
-                return ["Ebook", "Produk", "TemplateChat", "Affiliate", "PromptAI", "IdeKonten", "Notes"];
-            } catch (e) {
-                console.error("getSheets error:", e);
-                return ["Ebook", "Produk", "TemplateChat", "Affiliate", "PromptAI", "IdeKonten", "Notes"];
-            }
-        }
-
-        async function getSheetData(sheetName) {
-            try {
-                const res = await fetch(`${API_URL}?action=data&sheet=${encodeURIComponent(sheetName)}`);
-                const data = await res.json();
-                
-                if (Array.isArray(data) && data.length > 0) {
-                    const headers = data[0];
-                    const rows = data.slice(1);
-                    return rows.map(row => {
-                        const obj = {};
-                        headers.forEach((h, i) => obj[h] = row[i] || "");
-                        return obj;
-                    });
+    // ========================================
+    // CACHE HELPERS
+    // ========================================
+    function getCache(key) {
+        try {
+            const cached = localStorage.getItem(`${CACHE_KEY}_${key}`);
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < CACHE_DURATION) {
+                    return data;
                 }
-                return [];
-            } catch (e) {
-                console.error(`getSheetData(${sheetName}) error:`, e);
-                return [];
             }
-        }
+        } catch(e) {}
+        return null;
+    }
 
-        async function searchData(keyword) {
-            if (!keyword || keyword.length < 2) return [];
-            try {
-                const res = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(keyword)}`);
-                const data = await res.json();
-                if (Array.isArray(data)) return data;
-                return [];
-            } catch (e) {
-                console.error("searchData error:", e);
-                return [];
+    function setCache(key, data) {
+        try {
+            localStorage.setItem(`${CACHE_KEY}_${key}`, JSON.stringify({
+                data: data,
+                timestamp: Date.now()
+            }));
+        } catch(e) {}
+    }
+
+    // ========================================
+    // API FUNCTIONS (with cache)
+    // ========================================
+    async function getSheets() {
+        const cached = getCache("sheets");
+        if (cached) {
+            sheetsList = cached;
+            return cached;
+        }
+        
+        try {
+            const res = await fetch(`${API_URL}?action=sheets`);
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                setCache("sheets", data);
+                sheetsList = data;
+                return data;
             }
+            return ["Ebook", "Produk", "TemplateChat", "Affiliate", "PromptAI", "IdeKonten", "Notes"];
+        } catch(e) {
+            console.error(e);
+            return ["Ebook", "Produk", "TemplateChat", "Affiliate", "PromptAI", "IdeKonten", "Notes"];
         }
+    }
 
-        // ========================================
-        // SIDEBAR
-        // ========================================
-        async function loadSidebar() {
-            const menu = document.getElementById("sidebarMenu");
-            if (!menu) return;
+    async function getSheetData(sheetName, forceRefresh = false) {
+        if (!forceRefresh && sheetsCache[sheetName]) {
+            return sheetsCache[sheetName];
+        }
+        
+        try {
+            const res = await fetch(`${API_URL}?action=data&sheet=${encodeURIComponent(sheetName)}`);
+            const data = await res.json();
             
-            menu.innerHTML = '<li class="menu-item">🔄 Memuat menu...</li>';
-            
-            try {
-                const sheets = await getSheets();
-                menu.innerHTML = '';
+            if (Array.isArray(data) && data.length > 0) {
+                const headers = data[0];
+                const rows = data.slice(1);
+                const formatted = rows.map(row => {
+                    const obj = {};
+                    headers.forEach((h, i) => obj[h] = row[i] || "");
+                    return obj;
+                });
+                sheetsCache[sheetName] = formatted;
+                return formatted;
+            }
+            return [];
+        } catch(e) {
+            console.error(`Error loading ${sheetName}:`, e);
+            return [];
+        }
+    }
+
+    async function searchData(keyword) {
+        if (!keyword || keyword.length < 2) return [];
+        try {
+            const res = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(keyword)}`);
+            const data = await res.json();
+            return Array.isArray(data) ? data : [];
+        } catch(e) {
+            console.error(e);
+            return [];
+        }
+    }
+
+    // ========================================
+    // SIDEBAR
+    // ========================================
+    async function loadSidebar() {
+        const menu = document.getElementById("sidebarMenu");
+        if (!menu) return;
+        
+        menu.innerHTML = '<div class="spinner" style="width:30px;height:30px;margin:20px auto;"></div>';
+        
+        const sheets = await getSheets();
+        
+        menu.innerHTML = `
+            <li class="menu-item" data-sheet="dashboard">
+                <span>📊</span> Dashboard
+            </li>
+            <li style="padding:8px 16px;font-size:11px;color:rgba(255,255,255,0.4);">━━ DATABASE ━━</li>
+            ${sheets.map(sheet => `
+                <li class="menu-item" data-sheet="${sheet}">
+                    <span>📄</span> ${escapeHtml(sheet)}
+                </li>
+            `).join('')}
+        `;
+        
+        // Add click handlers
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const sheet = item.dataset.sheet;
+                document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+                item.classList.add('active');
                 
-                // Dashboard
-                const dashItem = document.createElement('li');
-                dashItem.className = 'menu-item active';
-                dashItem.innerHTML = '📊 Dashboard';
-                dashItem.onclick = () => {
-                    setActiveMenu(dashItem);
+                if (sheet === 'dashboard') {
                     loadDashboard();
-                    closeMobileSidebar();
-                };
-                menu.appendChild(dashItem);
+                } else {
+                    loadSheet(sheet);
+                }
                 
-                // Separator
-                const sep = document.createElement('li');
-                sep.className = 'menu-separator';
-                sep.innerHTML = '━━━━ DATABASE ━━━━';
-                menu.appendChild(sep);
-                
-                // Sheets
-                sheets.forEach(sheet => {
-                    const li = document.createElement('li');
-                    li.className = 'menu-item';
-                    li.innerHTML = `📄 ${sheet}`;
-                    li.onclick = () => {
-                        setActiveMenu(li);
-                        loadSheet(sheet);
-                        closeMobileSidebar();
-                    };
-                    menu.appendChild(li);
-                });
-                
-            } catch (e) {
-                menu.innerHTML = '<li class="menu-item">❌ Gagal memuat menu</li>';
-            }
-        }
-        
-        function setActiveMenu(activeItem) {
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
+                // Close mobile sidebar
+                if (window.innerWidth <= 768) {
+                    toggleSidebar(false);
+                }
             });
-            activeItem.classList.add('active');
-        }
-        
-        function closeMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        }
-        
-        function openMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.add('open');
-            overlay.classList.add('active');
-        }
+        });
+    }
 
-        // ========================================
-        // DASHBOARD
-        // ========================================
-        async function loadDashboard() {
-            const content = document.getElementById('content');
-            const searchResults = document.getElementById('searchResults');
-            const searchInput = document.getElementById('searchInput');
-            
-            content.innerHTML = '<div class="card text-center"><div class="loading-spinner"></div><p>Memuat Dashboard...</p></div>';
-            if (searchResults) searchResults.innerHTML = '';
-            if (searchInput) searchInput.value = '';
-            
-            try {
-                const sheets = await getSheets();
-                const stats = [];
-                let totalItems = 0;
-                
-                for (const sheet of sheets) {
-                    const data = await getSheetData(sheet);
-                    stats.push({ name: sheet, count: data.length });
-                    totalItems += data.length;
-                }
-                
-                let html = `
-                    <div class="dashboard-welcome">
-                        <h1>🏠 Creator Vault</h1>
-                        <p>Personal Knowledge Hub & Digital Library</p>
-                    </div>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-number">${sheets.length}</div>
-                            <div class="stat-label">Database Categories</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">${totalItems}</div>
-                            <div class="stat-label">Total Items</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">⚡</div>
-                            <div class="stat-label">Live Sync</div>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>📚 Semua Database</h3>
-                        <div class="sheet-grid">
-                `;
-                
-                const icons = {
-                    "Ebook": "📚", "Produk": "🛒", "Pelanggan": "👥", "TemplateChat": "💬",
-                    "Affiliate": "🔗", "PromptAI": "🤖", "IdeKonten": "💡", "Notes": "📝",
-                    "ReadingProgress": "📖", "Bookmarks": "🔖", "Highlights": "✨"
-                };
-                
-                stats.forEach(s => {
-                    const icon = icons[s.name] || "📄";
-                    html += `
-                        <div class="sheet-card" onclick="loadSheet('${s.name}')">
-                            <div class="sheet-icon">${icon}</div>
-                            <div class="sheet-name">${escapeHtml(s.name)}</div>
-                            <div class="sheet-count">📊 ${s.count} items</div>
-                        </div>
-                    `;
-                });
-                
-                html += `
-                        </div>
-                    </div>
-                    
-                    <div class="card tips-card">
-                        <h3>💡 Panduan Cepat</h3>
-                        <ul>
-                            <li>🔍 Gunakan kotak search di atas untuk mencari ke semua database</li>
-                            <li>📄 Klik sheet di sidebar kiri atau di dashboard untuk melihat semua data</li>
-                            <li>👆 Klik baris tabel untuk melihat detail lengkap</li>
-                            <li>✨ Tambah sheet baru di Google Spreadsheet, otomatis muncul di sini</li>
-                        </ul>
-                    </div>
-                `;
-                
-                content.innerHTML = html;
-                
-            } catch (e) {
-                content.innerHTML = `<div class="card error-card"><h3>⚠️ Error</h3><p>${e.message}</p><button class="btn-primary" onclick="loadDashboard()">🔄 Coba Lagi</button></div>`;
-            }
-        }
+    // ========================================
+    // DASHBOARD (with skeleton loading)
+    // ========================================
+    async function loadDashboard() {
+        const content = document.getElementById("content");
+        const searchResults = document.getElementById("searchResults");
+        if (searchResults) searchResults.innerHTML = "";
+        
+        // Show skeleton
+        content.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card"><div class="spinner"></div></div>
+                <div class="stat-card"><div class="spinner"></div></div>
+                <div class="stat-card"><div class="spinner"></div></div>
+            </div>
+            <div class="sheet-grid" id="sheetGrid"></div>
+        `;
+        
+        const sheets = await getSheets();
+        const stats = [];
+        let totalItems = 0;
+        
+        // Load stats in parallel
+        const promises = sheets.map(async sheet => {
+            const data = await getSheetData(sheet);
+            return { name: sheet, count: data.length };
+        });
+        
+        const statsResults = await Promise.all(promises);
+        stats.push(...statsResults);
+        totalItems = stats.reduce((s, i) => s + i.count, 0);
+        
+        // Update stats
+        document.getElementById("statsGrid").innerHTML = `
+            <div class="stat-card">
+                <div class="stat-number">${sheets.length}</div>
+                <div>Database</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${totalItems}</div>
+                <div>Total Items</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">⚡</div>
+                <div>Live Sync</div>
+            </div>
+        `;
+        
+        // Sheet grid
+        const icons = {
+            "Ebook": "📚", "Produk": "🛒", "Pelanggan": "👥", "TemplateChat": "💬",
+            "Affiliate": "🔗", "PromptAI": "🤖", "IdeKonten": "💡", "Notes": "📝"
+        };
+        
+        let gridHtml = `<div class="sheet-grid">`;
+        stats.forEach(s => {
+            const icon = icons[s.name] || "📄";
+            gridHtml += `
+                <div class="sheet-card" onclick="loadSheet('${s.name}')">
+                    <div class="sheet-icon">${icon}</div>
+                    <div class="sheet-name">${escapeHtml(s.name)}</div>
+                    <div class="sheet-count">📊 ${s.count} items</div>
+                </div>
+            `;
+        });
+        gridHtml += `</div>`;
+        
+        document.getElementById("sheetGrid").innerHTML = gridHtml;
+        
+        // Update active menu
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        const dashItem = document.querySelector('.menu-item[data-sheet="dashboard"]');
+        if (dashItem) dashItem.classList.add('active');
+        
+        currentSheet = null;
+    }
 
-        // ========================================
-        // SHEET VIEWER
-        // ========================================
-        async function loadSheet(sheetName) {
-            currentSheet = sheetName;
-            currentPage = 1;
-            currentFilter = "";
-            
-            const content = document.getElementById('content');
-            const searchResults = document.getElementById('searchResults');
-            const searchInput = document.getElementById('searchInput');
-            
-            content.innerHTML = '<div class="card text-center"><div class="loading-spinner"></div><p>Memuat data...</p></div>';
-            if (searchResults) searchResults.innerHTML = '';
-            if (searchInput) searchInput.value = '';
-            
-            try {
-                currentData = await getSheetData(sheetName);
-                if (currentData.length > 0) {
-                    currentHeaders = Object.keys(currentData[0]);
-                }
-                renderSheetData();
-            } catch (e) {
-                content.innerHTML = `<div class="card error-card"><h3>⚠️ Error</h3><p>${e.message}</p><button class="btn-primary" onclick="loadSheet('${sheetName}')">🔄 Coba Lagi</button></div>`;
-            }
+    // ========================================
+    // SHEET VIEWER (optimized)
+    // ========================================
+    async function loadSheet(sheetName) {
+        currentSheet = sheetName;
+        currentPage = 1;
+        currentFilter = "";
+        
+        const content = document.getElementById("content");
+        const searchResults = document.getElementById("searchResults");
+        if (searchResults) searchResults.innerHTML = "";
+        
+        content.innerHTML = `
+            <div class="table-container">
+                <div class="spinner" style="margin:40px auto;"></div>
+            </div>
+        `;
+        
+        const data = await getSheetData(sheetName);
+        currentData = data;
+        
+        if (currentData.length > 0) {
+            currentHeaders = Object.keys(currentData[0]);
         }
         
-        function renderSheetData() {
-            const content = document.getElementById('content');
-            
-            if (!currentData.length) {
-                content.innerHTML = `
-                    <div class="card text-center">
-                        <div class="sheet-icon" style="font-size:48px;">📭</div>
+        renderTableView();
+    }
+    
+    function renderTableView() {
+        const content = document.getElementById("content");
+        
+        if (!currentData.length) {
+            content.innerHTML = `
+                <div class="table-container" style="text-align:center;padding:60px;">
+                    <div style="font-size:48px;">📭</div>
+                    <h3>${escapeHtml(currentSheet)}</h3>
+                    <p>Tidak ada data</p>
+                    <button class="btn-primary" onclick="loadDashboard()">Kembali</button>
+                </div>
+            `;
+            return;
+        }
+        
+        let filteredData = [...currentData];
+        if (currentFilter) {
+            filteredData = currentData.filter(row => 
+                JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
+            );
+        }
+        
+        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+        const start = (currentPage - 1) * itemsPerPage;
+        const pageData = filteredData.slice(start, start + itemsPerPage);
+        
+        let html = `
+            <div class="table-container">
+                <div class="table-header">
+                    <div>
                         <h3>📄 ${escapeHtml(currentSheet)}</h3>
-                        <p>Tidak ada data di sheet ini.</p>
-                        <button class="btn-primary" onclick="loadDashboard()">← Kembali ke Dashboard</button>
+                        <small style="color:#667eea;">${filteredData.length} items</small>
                     </div>
-                `;
+                    <div style="display:flex;gap:12px;">
+                        <input type="text" class="filter-input" id="filterInput" placeholder="🔍 Filter data..." value="${escapeHtml(currentFilter)}">
+                        <button class="btn-outline" onclick="loadDashboard()">Dashboard</button>
+                    </div>
+                </div>
+                <div style="overflow-x:auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                ${currentHeaders.map(h => `<th>${escapeHtml(h)}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${pageData.map((row, idx) => `
+                                <tr onclick="showDetail(${start + idx})">
+                                    ${currentHeaders.map(h => `<td>${escapeHtml(String(row[h] || '').substring(0, 40))}${String(row[h] || '').length > 40 ? '...' : ''}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+        `;
+        
+        if (totalPages > 1) {
+            html += `<div class="pagination">`;
+            html += `<button class="page-btn" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>◀</button>`;
+            
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+            
+            if (startPage > 1) html += `<button class="page-btn" onclick="goToPage(1)">1</button>${startPage > 2 ? '<span>...</span>' : ''}`;
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            if (endPage < totalPages) html += `${endPage < totalPages - 1 ? '<span>...</span>' : ''}<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+            
+            html += `<button class="page-btn" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>▶</button>`;
+            html += `</div>`;
+        }
+        
+        html += `</div>`;
+        content.innerHTML = html;
+        
+        // Filter handler
+        const filterInput = document.getElementById("filterInput");
+        if (filterInput) {
+            filterInput.onkeyup = (e) => {
+                currentFilter = e.target.value;
+                currentPage = 1;
+                renderTableView();
+            };
+        }
+    }
+    
+    function changePage(delta) {
+        currentPage += delta;
+        renderTableView();
+    }
+    
+    function goToPage(page) {
+        currentPage = page;
+        renderTableView();
+    }
+    
+    function showDetail(index) {
+        let filteredData = [...currentData];
+        if (currentFilter) {
+            filteredData = currentData.filter(row => 
+                JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
+            );
+        }
+        const item = filteredData[index];
+        if (!item) return;
+        
+        const modal = document.getElementById("detailModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalBody = document.getElementById("modalBody");
+        const modalAction = document.getElementById("modalAction");
+        
+        modalTitle.innerHTML = `📋 Detail - ${escapeHtml(currentSheet)}`;
+        
+        let bodyHtml = "";
+        for (const [key, val] of Object.entries(item)) {
+            bodyHtml += `
+                <div class="detail-row">
+                    <div class="detail-label">${escapeHtml(key)}</div>
+                    <div class="detail-value">
+                        ${isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : escapeHtml(String(val))}
+                    </div>
+                </div>
+            `;
+        }
+        modalBody.innerHTML = bodyHtml;
+        
+        modalAction.onclick = () => {
+            closeModal();
+            loadSheet(currentSheet);
+        };
+        modalAction.innerHTML = `📄 Lihat semua di ${escapeHtml(currentSheet)}`;
+        
+        modal.classList.add("active");
+    }
+    
+    function closeModal() {
+        document.getElementById("detailModal").classList.remove("active");
+    }
+
+    // ========================================
+    // SEARCH
+    // ========================================
+    let searchTimeout;
+    
+    function initSearch() {
+        const input = document.getElementById("searchInput");
+        if (!input) return;
+        
+        input.addEventListener("input", async () => {
+            clearTimeout(searchTimeout);
+            const keyword = input.value.trim();
+            const resultsDiv = document.getElementById("searchResults");
+            
+            if (keyword.length < 2) {
+                resultsDiv.innerHTML = "";
                 return;
             }
             
-            let filteredData = [...currentData];
-            if (currentFilter) {
-                filteredData = currentData.filter(row => 
-                    JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
-                );
-            }
-            
-            const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
-            const start = (currentPage - 1) * ITEMS_PER_PAGE;
-            const pageData = filteredData.slice(start, start + ITEMS_PER_PAGE);
-            
-            let html = `
-                <div class="sheet-header">
-                    <div>
-                        <h2>📄 ${escapeHtml(currentSheet)}</h2>
-                        <p class="text-muted">📊 ${filteredData.length} item ditemukan${currentFilter ? ` (filter: "${currentFilter}")` : ''}</p>
-                    </div>
-                    <div>
-                        <button class="btn-secondary" onclick="loadDashboard()">← Dashboard</button>
-                    </div>
-                </div>
+            searchTimeout = setTimeout(async () => {
+                resultsDiv.innerHTML = '<div class="spinner" style="margin:20px auto;"></div>';
                 
-                <div class="card">
-                    <div class="filter-bar">
-                        <input type="text" id="sheetFilter" placeholder="🔍 Filter data di sheet ini..." value="${escapeHtml(currentFilter)}" onkeyup="filterSheetData(event)">
-                        ${currentFilter ? `<button class="btn-small" onclick="clearFilter()">✖ Clear</button>` : ''}
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    ${currentHeaders.map(h => `<th>${escapeHtml(h)}</th>`).join('')}
-                                    <th style="width:80px">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${pageData.map((row, idx) => renderTableRow(row, start + idx)).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-            `;
-            
-            if (totalPages > 1) {
-                html += `
-                    <div class="pagination">
-                        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>◀ Sebelumnya</button>
-                        <span>Halaman ${currentPage} dari ${totalPages}</span>
-                        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Berikutnya ▶</button>
-                    </div>
-                `;
-            }
-            
-            html += `</div>`;
-            content.innerHTML = html;
-            
-            const filterInput = document.getElementById('sheetFilter');
-            if (filterInput) filterInput.focus();
-        }
-        
-        function renderTableRow(row, index) {
-            return `
-                <tr onclick="showDetail(${index})">
-                    ${currentHeaders.map(h => {
-                        let val = row[h] || '';
-                        val = val.length > 50 ? val.substring(0, 50) + '...' : val;
-                        return `<td title="${escapeHtml(row[h] || '')}">${escapeHtml(val)}</td>`;
-                    }).join('')}
-                    <td><button class="btn-small" onclick="event.stopPropagation(); showDetail(${index})">👁️ Detail</button></td>
-                </tr>
-            `;
-        }
-        
-        function filterSheetData(event) {
-            currentFilter = event.target.value;
-            currentPage = 1;
-            renderSheetData();
-        }
-        
-        function clearFilter() {
-            currentFilter = "";
-            currentPage = 1;
-            renderSheetData();
-        }
-        
-        function changePage(delta) {
-            currentPage += delta;
-            renderSheetData();
-        }
-        
-        function showDetail(index) {
-            let filteredData = [...currentData];
-            if (currentFilter) {
-                filteredData = currentData.filter(row => 
-                    JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
-                );
-            }
-            const item = filteredData[index];
-            if (!item) return;
-            
-            let html = `
-                <div class="card">
-                    <div class="detail-header">
-                        <h2>📋 Detail Item - ${escapeHtml(currentSheet)}</h2>
-                        <button class="btn-secondary" onclick="loadSheet('${currentSheet}')">✖ Kembali</button>
-                    </div>
-                    <div class="detail-body">
-            `;
-            
-            for (const [key, val] of Object.entries(item)) {
-                html += `
-                    <div class="detail-row">
-                        <div class="detail-label">${escapeHtml(key)}</div>
-                        <div class="detail-value">
-                            ${isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : 
-                              val ? `<pre>${escapeHtml(String(val))}</pre>` : '-'}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += `
-                    </div>
-                    <div class="detail-footer">
-                        <button class="btn-primary" onclick="loadSheet('${currentSheet}')">📄 Lihat semua di ${escapeHtml(currentSheet)}</button>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('content').innerHTML = html;
-        }
-
-        // ========================================
-        // SEARCH
-        // ========================================
-        let searchTimeout;
-        
-        function initSearch() {
-            const input = document.getElementById('searchInput');
-            if (!input) return;
-            
-            input.addEventListener('input', async () => {
-                clearTimeout(searchTimeout);
-                const keyword = input.value.trim();
+                const data = await searchData(keyword);
+                lastSearchData = data;
                 
-                if (keyword.length < 2) {
-                    document.getElementById('searchResults').innerHTML = '';
+                if (!data.length) {
+                    resultsDiv.innerHTML = `<div class="search-results"><div style="background:white;border-radius:16px;padding:40px;text-align:center;">😕 Tidak ada hasil untuk "${escapeHtml(keyword)}"</div></div>`;
                     return;
                 }
                 
-                searchTimeout = setTimeout(async () => {
-                    const resultsDiv = document.getElementById('searchResults');
-                    resultsDiv.innerHTML = '<div class="card text-center"><div class="loading-spinner"></div><p>🔍 Mencari...</p></div>';
-                    
-                    try {
-                        const data = await searchData(keyword);
-                        lastSearchData = data;
-                        
-                        if (!data.length) {
-                            resultsDiv.innerHTML = `<div class="card text-center"><p>😕 Tidak ada hasil untuk "<strong>${escapeHtml(keyword)}</strong>"</p></div>`;
-                            return;
-                        }
-                        
-                        const grouped = {};
-                        data.forEach(item => {
-                            const sheet = item.sheet || 'Unknown';
-                            if (!grouped[sheet]) grouped[sheet] = [];
-                            grouped[sheet].push(item);
-                        });
-                        
-                        let html = `
-                            <div class="search-header">
-                                <h3>🔍 Hasil: "${escapeHtml(keyword)}"</h3>
-                                <button class="btn-small" onclick="clearSearch()">✖ Tutup</button>
+                // Group results
+                const grouped = {};
+                data.forEach(item => {
+                    const sheet = item.sheet || "Unknown";
+                    if (!grouped[sheet]) grouped[sheet] = [];
+                    grouped[sheet].push(item);
+                });
+                
+                let html = `<div class="search-results">`;
+                for (const [sheet, items] of Object.entries(grouped)) {
+                    html += `
+                        <div class="result-group">
+                            <div class="result-group-header" onclick="loadSheet('${sheet}')">
+                                <span>📄 ${escapeHtml(sheet)}</span>
+                                <span style="background:#667eea;color:white;padding:2px 10px;border-radius:20px;">${items.length}</span>
+                            </div>
+                    `;
+                    items.slice(0, 5).forEach((item, idx) => {
+                        const title = item.title || item.judul || item.nama || Object.values(item)[0] || "Tanpa judul";
+                        html += `
+                            <div class="result-item" onclick="showSearchDetail('${sheet}', ${idx})">
+                                📌 ${escapeHtml(String(title).substring(0, 80))}
                             </div>
                         `;
-                        
-                        for (const [sheet, items] of Object.entries(grouped)) {
-                            html += `
-                                <div class="card search-group">
-                                    <div class="search-sheet-header" onclick="loadSheet('${sheet}')">
-                                        <span>📄 ${escapeHtml(sheet)}</span>
-                                        <span class="badge">${items.length}</span>
-                                    </div>
-                                    <div class="search-items">
-                            `;
-                            
-                            items.slice(0, 5).forEach((item, idx) => {
-                                const title = item.title || item.judul || item.nama || Object.values(item)[0] || 'Tanpa judul';
-                                html += `
-                                    <div class="search-item" onclick="showSearchDetail('${sheet}', ${idx})">
-                                        <div class="search-item-title">📌 ${escapeHtml(String(title).substring(0, 80))}</div>
-                                    </div>
-                                `;
-                            });
-                            
-                            if (items.length > 5) {
-                                html += `<div class="search-more" onclick="loadSheet('${sheet}')">+ ${items.length - 5} hasil lainnya di ${escapeHtml(sheet)}</div>`;
-                            }
-                            
-                            html += `</div></div>`;
-                        }
-                        
-                        resultsDiv.innerHTML = html;
-                        
-                    } catch (e) {
-                        resultsDiv.innerHTML = `<div class="card error-card"><p>❌ Error: ${e.message}</p></div>`;
+                    });
+                    if (items.length > 5) {
+                        html += `<div class="result-item" style="color:#667eea;cursor:pointer;" onclick="loadSheet('${sheet}')">+ ${items.length - 5} hasil lainnya</div>`;
                     }
-                }, 400);
-            });
-        }
+                    html += `</div>`;
+                }
+                html += `</div>`;
+                resultsDiv.innerHTML = html;
+            }, 400);
+        });
+    }
+    
+    function showSearchDetail(sheet, idx) {
+        const sheetItems = lastSearchData.filter(item => item.sheet === sheet);
+        const item = sheetItems[idx];
+        if (!item) return;
         
-        function showSearchDetail(sheet, idx) {
-            const sheetItems = lastSearchData.filter(item => item.sheet === sheet);
-            const item = sheetItems[idx];
-            if (!item) return;
-            
-            let html = `
-                <div class="card">
-                    <div class="detail-header">
-                        <h2>📋 Detail dari ${escapeHtml(sheet)}</h2>
-                        <button class="btn-secondary" onclick="loadDashboard()">✖ Tutup</button>
-                    </div>
-                    <div class="detail-body">
-            `;
-            
-            for (const [key, val] of Object.entries(item)) {
-                if (key === 'sheet') continue;
-                html += `
-                    <div class="detail-row">
-                        <div class="detail-label">${escapeHtml(key)}</div>
-                        <div class="detail-value">
-                            ${isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : 
-                              val ? `<pre>${escapeHtml(String(val))}</pre>` : '-'}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += `
-                    </div>
-                    <div class="detail-footer">
-                        <button class="btn-primary" onclick="loadSheet('${sheet}')">📄 Lihat semua di ${escapeHtml(sheet)}</button>
+        const modal = document.getElementById("detailModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalBody = document.getElementById("modalBody");
+        const modalAction = document.getElementById("modalAction");
+        
+        modalTitle.innerHTML = `📋 Detail dari ${escapeHtml(sheet)}`;
+        
+        let bodyHtml = "";
+        for (const [key, val] of Object.entries(item)) {
+            if (key === "sheet") continue;
+            bodyHtml += `
+                <div class="detail-row">
+                    <div class="detail-label">${escapeHtml(key)}</div>
+                    <div class="detail-value">
+                        ${isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : escapeHtml(String(val))}
                     </div>
                 </div>
             `;
-            
-            document.getElementById('content').innerHTML = html;
-            document.getElementById('searchResults').innerHTML = '';
-            document.getElementById('searchInput').value = '';
         }
+        modalBody.innerHTML = bodyHtml;
         
-        function clearSearch() {
-            document.getElementById('searchResults').innerHTML = '';
-            document.getElementById('searchInput').value = '';
-            lastSearchData = [];
-        }
+        modalAction.onclick = () => {
+            closeModal();
+            loadSheet(sheet);
+        };
+        modalAction.innerHTML = `📄 Lihat semua di ${escapeHtml(sheet)}`;
+        
+        modal.classList.add("active");
+        
+        // Clear search
+        document.getElementById("searchResults").innerHTML = "";
+        document.getElementById("searchInput").value = "";
+    }
 
-        // ========================================
-        // UTILITY FUNCTIONS
-        // ========================================
-        function isUrl(str) {
-            if (!str || typeof str !== 'string') return false;
-            return str.startsWith('http://') || str.startsWith('https://') || str.includes('drive.google.com');
+    // ========================================
+    // UTILITIES
+    // ========================================
+    function isUrl(str) {
+        if (!str || typeof str !== "string") return false;
+        return str.startsWith("http://") || str.startsWith("https://") || str.includes("drive.google.com");
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+    
+    function toggleSidebar(show) {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+        if (show) {
+            sidebar.classList.add("open");
+            overlay.classList.add("active");
+        } else {
+            sidebar.classList.remove("open");
+            overlay.classList.remove("active");
         }
-        
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
+    }
 
-        // ========================================
-        // INITIALIZATION
-        // ========================================
-        window.loadDashboard = loadDashboard;
-        window.loadSheet = loadSheet;
-        window.showDetail = showDetail;
-        window.changePage = changePage;
-        window.filterSheetData = filterSheetData;
-        window.clearFilter = clearFilter;
-        window.clearSearch = clearSearch;
-        window.showSearchDetail = showSearchDetail;
+    // ========================================
+    // INIT
+    // ========================================
+    window.loadDashboard = loadDashboard;
+    window.loadSheet = loadSheet;
+    window.showDetail = showDetail;
+    window.changePage = changePage;
+    window.goToPage = goToPage;
+    window.closeModal = closeModal;
+    window.showSearchDetail = showSearchDetail;
+    
+    document.addEventListener("DOMContentLoaded", async () => {
+        // Mobile menu handlers
+        const menuToggle = document.getElementById("menuToggle");
+        const closeSidebar = document.getElementById("closeSidebar");
+        const overlay = document.getElementById("overlay");
         
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Setup mobile menu
-            const mobileBtn = document.getElementById('mobileMenuBtn');
-            const overlay = document.getElementById('sidebarOverlay');
-            
-            mobileBtn.onclick = openMobileSidebar;
-            overlay.onclick = closeMobileSidebar;
-            
-            await loadSidebar();
-            await loadDashboard();
-            initSearch();
-        });
-    </script>
+        if (menuToggle) menuToggle.onclick = () => toggleSidebar(true);
+        if (closeSidebar) closeSidebar.onclick = () => toggleSidebar(false);
+        if (overlay) overlay.onclick = () => toggleSidebar(false);
+        
+        await loadSidebar();
+        await loadDashboard();
+        initSearch();
+    });
+</script>
 </body>
     </html>
