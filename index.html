@@ -3,131 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Vault</title>
+    <title>Creator Vault - Personal Knowledge Hub</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background: #121212;
-            color: #fff;
-        }
-        .app {
-            display: flex;
-            min-height: 100vh;
-        }
-        .sidebar {
-            width: 260px;
-            background: #1a1a1a;
-            border-right: 1px solid #333;
-            padding: 20px;
-        }
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .menu {
-            list-style: none;
-        }
-        .menu li {
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 5px;
-        }
-        .menu li:hover {
-            background: #333;
-        }
-        .main {
-            flex: 1;
-            padding: 20px;
-        }
-        .search-box {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: #1f1f1f;
-            color: #fff;
-            margin-bottom: 20px;
-        }
-        .card {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #333;
-        }
-        th {
-            background: #1f1f1f;
-        }
-        .result-item {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        .result-item:hover {
-            background: #252525;
-        }
-        .sheet-name {
-            font-size: 12px;
-            color: #999;
-        }
-        .title {
-            font-size: 16px;
-            margin-top: 5px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        .stat-card {
-            background: #1f1f1f;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 32px;
-            font-weight: bold;
-            color: #4a9eff;
-        }
-        button {
-            background: #4a9eff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            color: white;
-            cursor: pointer;
-        }
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #121212; color: #ffffff; }
+        .app { display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: #1a1a1a; border-right: 1px solid #2a2a2a; padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        .logo { font-size: 22px; font-weight: bold; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #2a2a2a; }
+        .menu { list-style: none; }
+        .menu li { padding: 12px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; transition: all 0.2s ease; }
+        .menu li:hover { background: #2a2a2a; }
+        .menu li.active { background: #2a5f8a; color: white; }
+        .menu-separator { font-size: 12px; color: #555; cursor: default; padding: 8px 12px; opacity: 0.5; }
+        .main { flex: 1; padding: 24px; overflow-x: auto; }
+        .header { margin-bottom: 24px; }
+        .header h1 { font-size: 28px; margin-bottom: 4px; }
+        .header p { color: #888; font-size: 14px; }
+        .search-box { width: 100%; padding: 14px 16px; border: none; border-radius: 12px; background: #1f1f1f; color: #fff; font-size: 16px; margin-bottom: 24px; transition: all 0.2s; }
+        .search-box:focus { outline: none; background: #2a2a2a; box-shadow: 0 0 0 2px #2a5f8a; }
+        .card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 20px; margin-bottom: 20px; }
+        .dashboard-welcome { margin-bottom: 30px; }
+        .dashboard-welcome h1 { font-size: 32px; margin-bottom: 8px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 16px; padding: 24px; text-align: center; border: 1px solid #2a2a4a; }
+        .stat-number { font-size: 42px; font-weight: bold; color: #4a9eff; }
+        .stat-label { margin-top: 8px; color: #aaa; font-size: 14px; }
+        .sheet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+        .sheet-card { background: #1f1f1f; border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s ease; border: 1px solid #2a2a2a; }
+        .sheet-card:hover { transform: translateY(-2px); border-color: #4a9eff; background: #252525; }
+        .sheet-icon { font-size: 32px; margin-bottom: 8px; }
+        .sheet-name { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+        .sheet-count { font-size: 12px; color: #4a9eff; }
+        .table-responsive { overflow-x: auto; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { padding: 12px; border-bottom: 1px solid #2a2a2a; text-align: left; }
+        .table th { background: #1f1f1f; font-weight: 600; position: sticky; top: 0; }
+        .table tbody tr:hover { background: #252525; cursor: pointer; }
+        .pagination { display: flex; justify-content: center; gap: 16px; margin-top: 20px; padding-top: 16px; }
+        .pagination button { background: #2a2a2a; border: none; padding: 8px 20px; border-radius: 8px; color: white; cursor: pointer; }
+        .pagination button:hover:not(:disabled) { background: #3a3a3a; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #2a2a2a; }
+        .btn-close, .btn-primary { background: #4a9eff; border: none; padding: 8px 16px; border-radius: 8px; color: white; cursor: pointer; }
+        .btn-close:hover, .btn-primary:hover { background: #3a7ecc; }
+        .btn-small { background: #2a2a2a; border: none; padding: 4px 10px; border-radius: 6px; color: white; cursor: pointer; font-size: 12px; }
+        .detail-body { max-height: 65vh; overflow-y: auto; }
+        .detail-row { display: flex; padding: 12px; border-bottom: 1px solid #2a2a2a; }
+        .detail-label { width: 180px; font-weight: bold; color: #4a9eff; flex-shrink: 0; }
+        .detail-value { flex: 1; word-break: break-word; }
+        .detail-value pre { background: #0d0d0d; padding: 10px; border-radius: 8px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 13px; margin: 0; white-space: pre-wrap; }
+        .search-header { margin-bottom: 20px; }
+        .search-group { margin-bottom: 20px; }
+        .search-sheet-header { font-size: 16px; font-weight: bold; padding: 12px; background: #1f1f1f; border-radius: 10px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .badge { background: #4a9eff; padding: 2px 10px; border-radius: 20px; font-size: 12px; }
+        .search-item { padding: 12px; border-bottom: 1px solid #2a2a2a; cursor: pointer; }
+        .search-item:hover { background: #252525; }
+        .search-item-title { font-weight: bold; margin-bottom: 6px; }
+        .tips-card ul { margin-left: 20px; margin-top: 12px; }
+        .tips-card li { margin: 8px 0; color: #aaa; }
         @media (max-width: 768px) {
             .app { flex-direction: column; }
-            .sidebar { width: 100%; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .menu { display: flex; flex-wrap: wrap; gap: 8px; }
+            .menu-separator { display: none; }
+            .stats-grid, .sheet-grid { grid-template-columns: 1fr; }
+            .detail-row { flex-direction: column; }
+            .detail-label { width: 100%; margin-bottom: 6px; }
         }
     </style>
 </head>
@@ -135,23 +76,22 @@
     <div class="app">
         <aside class="sidebar">
             <div class="logo">🏦 Creator Vault</div>
-            <ul class="menu" id="sidebarMenu">
-                <li>Loading...</li>
-            </ul>
+            <ul class="menu" id="sidebarMenu"><li>Loading...</li></ul>
         </aside>
         <main class="main">
-            <h1 style="margin-bottom:20px">Creator Vault</h1>
-            <input type="text" id="searchInput" class="search-box" placeholder="Cari ebook, produk, prompt...">
-            <div id="searchResults"></div>
-            <div id="content">
-                <div class="card">Memuat Dashboard...</div>
+            <div class="header">
+                <h1>Creator Vault</h1>
+                <p>Personal Knowledge Hub & Digital Library</p>
             </div>
+            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari ebook, produk, prompt, affiliate...">
+            <div id="searchResults"></div>
+            <div id="content"><div class="card"><h3>Memuat Dashboard...</h3></div></div>
         </main>
     </div>
 
     <script>
         // ==================== CONFIG ====================
-        const API_URL = "const API_URL = "const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5UL0HyAYtMz7MWb5kQoqmJM1PIDG1RA64AxArCAqQLs_IG/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5UL0HyAYtMz7MWb5kQoqmJM1PIDG1RA64AxArCAqQLs_IG/exec";
 
         // ==================== API CALLS ====================
         async function getSheets() {
@@ -162,7 +102,6 @@
         async function getSheetData(sheetName) {
             const res = await fetch(`${API_URL}?action=data&sheet=${encodeURIComponent(sheetName)}`);
             const data = await res.json();
-            
             if (Array.isArray(data) && data.length > 0) {
                 const headers = data[0];
                 const rows = data.slice(1);
@@ -196,19 +135,16 @@
                 const sheets = await getSheets();
                 menu.innerHTML = "";
                 
-                // Dashboard menu
                 const dashLi = document.createElement("li");
                 dashLi.textContent = "📊 Dashboard";
                 dashLi.onclick = () => loadDashboard();
                 menu.appendChild(dashLi);
                 
-                // Separator
                 const sep = document.createElement("li");
-                sep.textContent = "──────────";
-                sep.style.cssText = "opacity:0.3;cursor:default";
+                sep.textContent = "━━━━━━━━━━━━━━━━";
+                sep.className = "menu-separator";
                 menu.appendChild(sep);
                 
-                // Sheets
                 sheets.forEach(sheet => {
                     const li = document.createElement("li");
                     li.textContent = `📄 ${sheet}`;
@@ -216,7 +152,7 @@
                     menu.appendChild(li);
                 });
             } catch(e) {
-                menu.innerHTML = "<li>Error loading menu</li>";
+                menu.innerHTML = `<li>Error: ${e.message}</li>`;
                 console.error(e);
             }
         }
@@ -225,6 +161,8 @@
         async function loadDashboard() {
             const content = document.getElementById("content");
             content.innerHTML = '<div class="card">Loading dashboard...</div>';
+            document.getElementById("searchResults").innerHTML = "";
+            document.getElementById("searchInput").value = "";
             
             try {
                 const sheets = await getSheets();
@@ -236,29 +174,46 @@
                 const totalItems = stats.reduce((s, i) => s + i.count, 0);
                 
                 let html = `
+                    <div class="dashboard-welcome">
+                        <h1>🏠 Creator Vault</h1>
+                        <p>Personal Knowledge Hub & Digital Library</p>
+                    </div>
                     <div class="stats-grid">
-                        <div class="stat-card"><div class="stat-number">${sheets.length}</div><div>Database</div></div>
-                        <div class="stat-card"><div class="stat-number">${totalItems}</div><div>Total Items</div></div>
-                        <div class="stat-card"><div class="stat-number">⚡</div><div>Live Sync</div></div>
+                        <div class="stat-card"><div class="stat-number">${sheets.length}</div><div class="stat-label">Database</div></div>
+                        <div class="stat-card"><div class="stat-number">${totalItems}</div><div class="stat-label">Total Items</div></div>
+                        <div class="stat-card"><div class="stat-number">⚡</div><div class="stat-label">Live Sync</div></div>
                     </div>
                     <div class="card">
                         <h3>📚 Semua Database</h3>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:15px">
+                        <div class="sheet-grid">
                 `;
                 
                 stats.forEach(s => {
-                    html += `<div onclick="loadSheet('${s.name}')" style="background:#1f1f1f;padding:15px;border-radius:10px;cursor:pointer">
-                                <div style="font-size:24px">📄</div>
-                                <div style="font-weight:bold">${s.name}</div>
-                                <div style="font-size:12px;color:#4a9eff">${s.count} items</div>
-                            </div>`;
+                    html += `
+                        <div class="sheet-card" onclick="loadSheet('${s.name}')">
+                            <div class="sheet-icon">📄</div>
+                            <div class="sheet-name">${s.name}</div>
+                            <div class="sheet-count">${s.count} items</div>
+                        </div>
+                    `;
                 });
                 
-                html += `</div></div>`;
+                html += `
+                        </div>
+                    </div>
+                    <div class="card tips-card">
+                        <h3>💡 Panduan Cepat</h3>
+                        <ul>
+                            <li>🔍 Gunakan kotak search di atas untuk mencari ke semua database</li>
+                            <li>📄 Klik sheet di sidebar kiri untuk melihat semua data</li>
+                            <li>👆 Klik baris tabel untuk melihat detail lengkap</li>
+                            <li>✨ Tambah sheet baru di Google Spreadsheet, otomatis muncul di sini</li>
+                        </ul>
+                    </div>
+                `;
                 content.innerHTML = html;
-                document.getElementById("searchResults").innerHTML = "";
             } catch(e) {
-                content.innerHTML = `<div class="card">Error: ${e.message}</div>`;
+                content.innerHTML = `<div class="card error-card"><h3>⚠️ Error</h3><p>${e.message}</p><button onclick="loadDashboard()">🔄 Coba Lagi</button></div>`;
             }
         }
 
@@ -268,6 +223,8 @@
             currentPage = 1;
             const content = document.getElementById("content");
             content.innerHTML = '<div class="card">Memuat data...</div>';
+            document.getElementById("searchResults").innerHTML = "";
+            document.getElementById("searchInput").value = "";
             
             try {
                 currentData = await getSheetData(sheetName);
@@ -275,9 +232,8 @@
                     currentHeaders = Object.keys(currentData[0]);
                 }
                 renderSheetData();
-                document.getElementById("searchResults").innerHTML = "";
             } catch(e) {
-                content.innerHTML = `<div class="card">Error: ${e.message}</div>`;
+                content.innerHTML = `<div class="card"><h3>⚠️ Error</h3><p>${e.message}</p><button onclick="loadDashboard()">Kembali</button></div>`;
             }
         }
         
@@ -285,7 +241,7 @@
             const content = document.getElementById("content");
             
             if (!currentData.length) {
-                content.innerHTML = `<div class="card"><h3>📄 ${currentSheet}</h3><p>Tidak ada data</p><button onclick="loadDashboard()">Kembali</button></div>`;
+                content.innerHTML = `<div class="card"><h3>📄 ${currentSheet}</h3><p>Tidak ada data</p><button onclick="loadDashboard()">← Kembali</button></div>`;
                 return;
             }
             
@@ -293,30 +249,28 @@
             const start = (currentPage - 1) * perPage;
             const pageData = currentData.slice(start, start + perPage);
             
-            let html = `<div class="card"><h3>📄 ${currentSheet}</h3><p>Total: ${currentData.length} items</p></div>`;
-            html += `<div class="card"><div style="overflow-x:auto"><table><thead><tr>`;
-            currentHeaders.forEach(h => html += `<th>${h}</th>`);
+            let html = `<div class="sheet-header" style="display:flex;justify-content:space-between;margin-bottom:20px;"><h2>📄 ${currentSheet}</h2><div class="sheet-stats">📊 ${currentData.length} item</div></div>`;
+            html += `<div class="card"><div class="table-responsive"><table class="table"><thead><tr>`;
+            currentHeaders.forEach(h => html += `<th>${escapeHtml(h)}</th>`);
             html += `<th>Aksi</th></tr></thead><tbody>`;
             
             pageData.forEach((row, idx) => {
-                html += `<tr>`;
+                html += `<tr onclick="showDetail(${start + idx})">`;
                 currentHeaders.forEach(h => {
                     let val = row[h] || "";
                     val = val.length > 40 ? val.substring(0,40)+"..." : val;
-                    html += `<td title="${row[h] || ""}">${val}</td>`;
+                    html += `<td title="${escapeHtml(row[h] || "")}">${escapeHtml(val)}</td>`;
                 });
-                html += `<td><button onclick="showDetail(${start + idx})">Detail</button></td>`;
+                html += `<td><button class="btn-small" onclick="event.stopPropagation(); showDetail(${start + idx})">👁️ Detail</button></td>`;
                 html += `</tr>`;
             });
             
             html += `</tbody></table></div>`;
             
             if (totalPages > 1) {
-                html += `<div class="pagination">
-                            <button onclick="changePage(-1)" ${currentPage===1?'disabled':''}>◀ Prev</button>
-                            <span>Page ${currentPage} of ${totalPages}</span>
-                            <button onclick="changePage(1)" ${currentPage===totalPages?'disabled':''}>Next ▶</button>
-                         </div>`;
+                html += `<div class="pagination"><button onclick="changePage(-1)" ${currentPage===1?'disabled':''}>◀ Sebelumnya</button>
+                        <span>Halaman ${currentPage} dari ${totalPages}</span>
+                        <button onclick="changePage(1)" ${currentPage===totalPages?'disabled':''}>Berikutnya ▶</button></div>`;
             }
             html += `</div>`;
             content.innerHTML = html;
@@ -331,23 +285,19 @@
             const item = currentData[index];
             if (!item) return;
             
-            let html = `<div class="card">
-                            <div style="display:flex;justify-content:space-between;margin-bottom:15px">
-                                <h3>📋 Detail</h3>
-                                <button onclick="loadSheet('${currentSheet}')">✖ Tutup</button>
-                            </div>`;
+            let html = `<div class="card detail-card">
+                <div class="detail-header"><h2>📋 Detail Item - ${currentSheet}</h2><button class="btn-close" onclick="loadSheet('${currentSheet}')">✖ Kembali</button></div>
+                <div class="detail-body">`;
+            
             for (const [key, val] of Object.entries(item)) {
-                html += `<div style="display:flex;padding:8px;border-bottom:1px solid #333">
-                            <div style="width:150px;font-weight:bold;color:#4a9eff">${key}:</div>
-                            <div>${val || "-"}</div>
-                         </div>`;
+                html += `<div class="detail-row"><div class="detail-label">${escapeHtml(key)}</div>
+                        <div class="detail-value">${isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : val ? `<pre>${escapeHtml(String(val))}</pre>` : '-'}</div></div>`;
             }
-            html += `<div style="margin-top:15px"><button onclick="loadSheet('${currentSheet}')">← Kembali ke daftar</button></div>`;
-            html += `</div>`;
+            
+            html += `</div><div class="detail-footer"><button onclick="loadSheet('${currentSheet}')" class="btn-primary">📄 Lihat semua di ${currentSheet}</button></div></div>`;
             document.getElementById("content").innerHTML = html;
-            document.getElementById("searchResults").innerHTML = "";
         }
-
+        
         // ==================== SEARCH ====================
         let searchTimeout;
         function initSearch() {
@@ -360,62 +310,75 @@
                     return;
                 }
                 searchTimeout = setTimeout(async () => {
-                    const results = document.getElementById("searchResults");
-                    results.innerHTML = "<div class='card'>Mencari...</div>";
+                    const resultsDiv = document.getElementById("searchResults");
+                    resultsDiv.innerHTML = '<div class="card">🔍 Mencari...</div>';
                     try {
                         const data = await searchData(keyword);
                         if (!data.length) {
-                            results.innerHTML = `<div class="card">Tidak ada hasil untuk "${keyword}"</div>`;
+                            resultsDiv.innerHTML = `<div class="card">😕 Tidak ada hasil untuk "<strong>${escapeHtml(keyword)}</strong>"</div>`;
                             return;
                         }
-                        let html = `<div class="card"><h3>🔍 Hasil: "${keyword}"</h3><p>${data.length} ditemukan</p></div>`;
+                        
+                        const grouped = {};
                         data.forEach(item => {
-                            const title = item.title || item.judul || "Tanpa judul";
-                            html += `<div class="result-item" onclick="showSearchDetail('${item.sheet}', ${JSON.stringify(item.data).replace(/"/g, '&quot;')})">
-                                        <div class="sheet-name">📄 ${item.sheet}</div>
-                                        <div class="title">${title}</div>
-                                    </div>`;
+                            if (!grouped[item.sheet]) grouped[item.sheet] = [];
+                            grouped[item.sheet].push(item);
                         });
-                        results.innerHTML = html;
+                        
+                        let html = `<div class="search-header"><h3>🔍 Hasil: "${escapeHtml(keyword)}"</h3><p>${data.length} hasil dari ${Object.keys(grouped).length} kategori</p></div>`;
+                        for (const [sheet, items] of Object.entries(grouped)) {
+                            html += `<div class="card search-group"><div class="search-sheet-header" onclick="loadSheet('${sheet}')">📄 ${sheet} <span class="badge">${items.length}</span></div><div class="search-items">`;
+                            items.slice(0, 5).forEach(item => {
+                                const title = item.title || item.judul || item.nama || Object.values(item)[0] || "Tanpa judul";
+                                html += `<div class="search-item" onclick="showSearchDetail('${sheet}', ${JSON.stringify(item).replace(/"/g, '&quot;')})"><div class="search-item-title">📌 ${escapeHtml(String(title).substring(0, 80))}</div></div>`;
+                            });
+                            if (items.length > 5) html += `<div class="search-more" onclick="loadSheet('${sheet}')">+ ${items.length-5} hasil lainnya</div>`;
+                            html += `</div></div>`;
+                        }
+                        resultsDiv.innerHTML = html;
+                        window.lastSearchResults = data;
                     } catch(e) {
-                        results.innerHTML = `<div class="card">Error: ${e.message}</div>`;
+                        resultsDiv.innerHTML = `<div class="card">Error: ${e.message}</div>`;
                     }
                 }, 300);
             });
         }
         
-        function showSearchDetail(sheet, data) {
-            let html = `<div class="card">
-                            <div style="display:flex;justify-content:space-between;margin-bottom:15px">
-                                <h3>📋 Detail dari ${sheet}</h3>
-                                <button onclick="location.reload()">✖ Tutup</button>
-                            </div>`;
-            for (const [key, val] of Object.entries(data)) {
-                html += `<div style="display:flex;padding:8px;border-bottom:1px solid #333">
-                            <div style="width:150px;font-weight:bold;color:#4a9eff">${key}:</div>
-                            <div>${val || "-"}</div>
-                         </div>`;
+        function showSearchDetail(sheet, itemData) {
+            const item = typeof itemData === 'string' ? JSON.parse(itemData) : itemData;
+            let html = `<div class="card detail-card"><div class="detail-header"><h2>📋 Detail dari ${sheet}</h2><button class="btn-close" onclick="loadDashboard()">✖ Tutup</button></div><div class="detail-body">`;
+            for (const [key, val] of Object.entries(item)) {
+                if (key === 'sheet') continue;
+                html += `<div class="detail-row"><div class="detail-label">${escapeHtml(key)}</div><div class="detail-value">${isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : val ? `<pre>${escapeHtml(String(val))}</pre>` : '-'}</div></div>`;
             }
-            html += `<div style="margin-top:15px"><button onclick="loadSheet('${sheet}')">← Lihat semua di ${sheet}</button></div>`;
-            html += `</div>`;
+            html += `</div><div class="detail-footer"><button onclick="loadSheet('${sheet}')" class="btn-primary">📄 Lihat semua di ${sheet}</button></div></div>`;
             document.getElementById("content").innerHTML = html;
             document.getElementById("searchResults").innerHTML = "";
             document.getElementById("searchInput").value = "";
         }
-
-        // ==================== INIT ====================
-        async function init() {
-            await loadSidebar();
-            await loadDashboard();
-            initSearch();
+        
+        function isUrl(str) {
+            if (!str || typeof str !== 'string') return false;
+            return str.startsWith('http://') || str.startsWith('https://') || str.includes('drive.google.com');
         }
         
-        // Make functions global
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        
+        // ==================== INIT ====================
         window.loadDashboard = loadDashboard;
         window.loadSheet = loadSheet;
         window.showDetail = showDetail;
         window.changePage = changePage;
         window.showSearchDetail = showSearchDetail;
+        
+        async function init() {
+            await loadSidebar();
+            await loadDashboard();
+            initSearch();
+        }
         
         init();
     </script>
