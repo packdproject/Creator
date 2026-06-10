@@ -1,0 +1,178 @@
+let currentSheet = null;
+let currentPage = 1;
+let currentData = [];
+const itemsPerPage = 20;
+
+async function loadSheet(sheetName) {
+  currentSheet = sheetName;
+  currentPage = 1;
+  showLoading();
+
+  try {
+    const data = await getSheetData(sheetName);
+    currentData = data;
+    renderSheetData(data, sheetName);
+  } catch (error) {
+    console.error("Error loading sheet:", error);
+    showError(`Gagal memuat data ${sheetName}`);
+  }
+}
+
+function renderSheetData(data, sheetName) {
+  const content = document.getElementById("content");
+  
+  if (!data || data.length === 0) {
+    content.innerHTML = `
+      <div class="card">
+        <h2>📄 ${sheetName}</h2>
+        <p>Tidak ada data di sheet ini.</p>
+        <p class="text-muted">Silakan tambahkan data di Google Spreadsheet.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Get all unique columns from all rows
+  const allColumns = getAllColumns(data);
+  
+  // Pagination
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const startIdx = (currentPage - 1) * itemsPerPage;
+  const endIdx = startIdx + itemsPerPage;
+  const pageData = data.slice(startIdx, endIdx);
+
+  let html = `
+    <div class="sheet-header">
+      <h2>📄 ${sheetName}</h2>
+      <div class="sheet-stats">${data.length} item ditemukan</div>
+    </div>
+
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              ${allColumns.map(col => `<th>${escapeHtml(col)}</th>`).join('')}
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pageData.map((row, idx) => renderTableRow(row, allColumns, startIdx + idx)).join('')}
+          </tbody>
+        </table>
+      </div>
+  `;
+
+  // Pagination controls
+  if (totalPages > 1) {
+    html += `
+      <div class="pagination">
+        <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>◀ Sebelumnya</button>
+        <span>Halaman ${currentPage} dari ${totalPages}</span>
+        <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Berikutnya ▶</button>
+      </div>
+    `;
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+function renderTableRow(row, columns, index) {
+  return `
+    <tr onclick="showDetail(${index})" style="cursor: pointer;">
+      ${columns.map(col => {
+        const value = row[col] || '';
+        const truncated = value.length > 50 ? value.substring(0, 50) + '...' : value;
+        return `<td title="${escapeHtml(value)}">${escapeHtml(truncated)}</td>`;
+      }).join('')}
+      <td>
+        <button class="btn-small" onclick="event.stopPropagation(); showDetail(${index})">👁️ Detail</button>
+      </td>
+    </tr>
+  `;
+}
+
+function getAllColumns(data) {
+  const columns = new Set();
+  data.forEach(row => {
+    Object.keys(row).forEach(key => columns.add(key));
+  });
+  return Array.from(columns);
+}
+
+function changePage(delta) {
+  currentPage += delta;
+  renderSheetData(currentData, currentSheet);
+}
+
+function showDetail(index) {
+  const item = currentData[index];
+  if (!item) return;
+
+  const content = document.getElementById("content");
+  
+  let detailsHtml = `
+    <div class="card detail-card">
+      <div class="detail-header">
+        <h2>📋 Detail Item</h2>
+        <button class="btn-close" onclick="loadSheet('${currentSheet}')">✖ Kembali</button>
+      </div>
+      <div class="detail-body">
+  `;
+
+  for (const [key, value] of Object.entries(item)) {
+    const displayValue = value && typeof value === 'object' ? JSON.stringify(value, null, 2) : value;
+    detailsHtml += `
+      <div class="detail-row">
+        <div class="detail-label">${escapeHtml(key)}</div>
+        <div class="detail-value">
+          ${isUrl(displayValue) ? `<a href="${displayValue}" target="_blank">${escapeHtml(displayValue)}</a>` : 
+            displayValue ? `<pre>${escapeHtml(String(displayValue))}</pre>` : '-'}
+        </div>
+      </div>
+    `;
+  }
+
+  detailsHtml += `
+      </div>
+    </div>
+  `;
+
+  content.innerHTML = detailsHtml;
+}
+
+function isUrl(str) {
+  if (!str || typeof str !== 'string') return false;
+  return str.startsWith('http://') || str.startsWith('https://') || str.startsWith('www.');
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function showLoading() {
+  const content = document.getElementById("content");
+  content.innerHTML = `
+    <div class="card">
+      <h3>🔄 Memuat data...</h3>
+    </div>
+  `;
+}
+
+function showError(message) {
+  const content = document.getElementById("content");
+  content.innerHTML = `
+    <div class="card error-card">
+      <h3>⚠️ Error</h3>
+      <p>${message}</p>
+      <button onclick="loadDashboard()" class="btn-primary">Kembali ke Dashboard</button>
+    </div>
+  `;
+}
