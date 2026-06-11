@@ -1,4 +1,10 @@
+// Google Apps Script API URL
 const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5UL0HyAYtMz7MWb5kQoqmJM1PIDG1RA64AxArCAqQLs_IG/exec";
+
+// Cache untuk menyimpan data
+let dataCache = null;
+let lastFetch = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 menit
 
 async function getSheets() {
     try {
@@ -18,12 +24,12 @@ async function getSheetData(sheetName, limit = 200) {
         const data = await res.json();
         console.log(`getSheetData ${sheetName}:`, data);
         
-        // Format baru: Array of Objects (langsung bisa digunakan)
+        // Format: Array of Objects (langsung bisa digunakan)
         if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object' && !Array.isArray(data[0])) {
             return data;
         }
         
-        // Format lama: 2D array (untuk kompatibilitas)
+        // Format: 2D array (untuk kompatibilitas)
         if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
             const headers = data[0];
             const rows = data.slice(1);
@@ -63,5 +69,39 @@ async function searchData(keyword, limit = 200) {
     } catch(e) {
         console.error("searchData error:", e);
         return [];
+    }
+}
+
+// Fungsi untuk load semua data dengan cache
+async function loadAllDataWithCache(forceRefresh = false) {
+    const now = Date.now();
+    
+    if (!forceRefresh && dataCache && (now - lastFetch) < CACHE_DURATION) {
+        console.log("Using cached data");
+        return dataCache;
+    }
+    
+    console.log("Fetching fresh data from API...");
+    
+    try {
+        const sheetsList = await getSheets();
+        const allData = {};
+        
+        // Load data untuk setiap sheet
+        for (const sheet of sheetsList) {
+            allData[sheet] = await getSheetData(sheet, 200);
+        }
+        
+        dataCache = {
+            sheets: sheetsList,
+            data: allData,
+            timestamp: now
+        };
+        lastFetch = now;
+        
+        return dataCache;
+    } catch(e) {
+        console.error("loadAllDataWithCache error:", e);
+        throw e;
     }
 }
