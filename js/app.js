@@ -1,144 +1,70 @@
-// Global variables
 let appInitialized = false;
 
-// Register global functions for HTML onclick
-window.loadDashboard = loadDashboard;
-window.loadSheet = loadSheet;
-window.showDetail = showDetail;
-window.changePage = changePage;
-window.showSearchDetail = showSearchDetail;
-window.clearSearch = clearSearch;
-window.testAPIConnection = testAPIConnection;
-window.exportSheetData = exportSheetData;
-window.filterSheetData = filterSheetData;
-window.clearFilter = clearFilter;
-
-// Main initialization function
 async function initApp() {
     if (appInitialized) return;
     
-    console.log("🚀 Initializing Creator Vault...");
+    console.log("Initializing Creator Vault...");
     
-    // Show loading indicator
-    showAppLoading();
+    // Show loading
+    document.getElementById('content').innerHTML = `
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Memuat data dari database...</p>
+            <p style="font-size:12px; margin-top:8px;">Ini hanya sekali, mohon tunggu...</p>
+        </div>
+    `;
     
     try {
-        // Test API connection first
-        const apiTest = await testAPIConnection();
-        if (!apiTest.success) {
-            console.warn("API connection test failed:", apiTest.error);
-            showAPIError(apiTest.error);
-        } else {
-            console.log("✅ API Connected. Found", apiTest.count, "sheets:", apiTest.sheets);
-        }
+        // Load data with cache
+        const cachedData = await loadAllDataWithCache();
         
-        // Load sidebar
+        // Set global variables
+        window.allSheetsData = cachedData.data;
+        window.sheetsList = cachedData.sheets;
+        
+        // Load sidebar and dashboard
         await loadSidebar();
-        
-        // Load dashboard
         await loadDashboard();
-        
-        // Initialize search
         initSearch();
         
-        // Start auto-refresh sidebar (optional)
-        startSidebarAutoRefresh();
-        
         appInitialized = true;
-        console.log("✅ Creator Vault initialized successfully");
+        console.log("App initialized successfully");
         
-    } catch (error) {
-        console.error("❌ Initialization error:", error);
-        showInitError(error.message);
-    }
-}
-
-function showAppLoading() {
-    const content = document.getElementById("content");
-    if (content) {
-        content.innerHTML = `
-            <div class="card loading-card">
-                <div class="loading-spinner"></div>
-                <h3>🚀 Memulai Creator Vault...</h3>
-                <p>Menghubungkan ke database...</p>
+        // Hide loading
+        document.getElementById('content').innerHTML = '';
+        
+    } catch(error) {
+        console.error("Init error:", error);
+        document.getElementById('content').innerHTML = `
+            <div class="empty-state">
+                <span style="font-size:48px;">⚠️</span>
+                <p>Gagal memuat data</p>
+                <p style="font-size:12px;">${error.message}</p>
+                <button class="refresh-btn" onclick="location.reload()" style="margin-top:16px;">Refresh Halaman</button>
             </div>
         `;
     }
 }
 
-function showAPIError(errorMsg) {
-    const content = document.getElementById("content");
-    if (content) {
-        content.innerHTML = `
-            <div class="card error-card">
-                <h3>⚠️ Koneksi API Gagal</h3>
-                <p>Error: ${escapeHtml(errorMsg)}</p>
-                <p class="text-muted">Pastikan Google Apps Script sudah di-deploy dengan akses "Anyone"</p>
-                <button onclick="initApp()" class="btn-primary">🔄 Coba Lagi</button>
-                <button onclick="testAPIConnection()" class="btn-secondary">🔍 Test Connection</button>
-            </div>
-        `;
+// Global functions
+window.manualRefresh = async function() {
+    const content = document.getElementById('content');
+    content.innerHTML = `<div class="loading"><div class="spinner"></div><p>Mengambil data terbaru...</p></div>`;
+    
+    try {
+        const freshData = await loadAllDataWithCache(true);
+        window.allSheetsData = freshData.data;
+        window.sheetsList = freshData.sheets;
+        
+        await loadSidebar();
+        await loadDashboard();
+        
+        showToast('Data berhasil diperbarui');
+    } catch(e) {
+        showToast('Gagal refresh data');
     }
-}
+};
 
-function showInitError(errorMsg) {
-    const content = document.getElementById("content");
-    if (content) {
-        content.innerHTML = `
-            <div class="card error-card">
-                <h3>❌ Gagal Memulai Aplikasi</h3>
-                <p>${escapeHtml(errorMsg)}</p>
-                <button onclick="initApp()" class="btn-primary">🔄 Refresh Aplikasi</button>
-            </div>
-        `;
-    }
-}
-
-// Handle offline mode
-window.addEventListener('online', () => {
-    console.log("🔄 Back online, refreshing data...");
-    if (appInitialized) {
-        loadDashboard();
-        loadSidebar();
-    }
-});
-
-window.addEventListener('offline', () => {
-    console.warn("⚠️ You are offline. Some features may not work.");
-    const content = document.getElementById("content");
-    if (content && content.innerHTML.includes("Memuat")) {
-        content.innerHTML = `
-            <div class="card warning-card">
-                <h3>⚠️ Koneksi Terputus</h3>
-                <p>Anda sedang offline. Periksa kembali koneksi internet Anda.</p>
-            </div>
-        `;
-    }
-});
-
-// Start the app when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
     initApp();
-});
-
-// Optional: Add keyboard shortcuts
-document.addEventListener("keydown", (e) => {
-    // Ctrl/Cmd + K to focus search
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput) {
-            searchInput.focus();
-            searchInput.select();
-        }
-    }
-    
-    // Escape to clear search
-    if (e.key === 'Escape') {
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput && searchInput.value) {
-            searchInput.value = "";
-            clearSearch();
-        }
-    }
 });
