@@ -4,7 +4,388 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Creator Vault - Digital Library</title>
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f5f7fb;
+            --bg-secondary: #ffffff;
+            --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            --sidebar-text: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #666666;
+            --border-color: #eef2f6;
+            --accent: #4a9eff;
+            --card-bg: #ffffff;
+        }
+
+        body.dark {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --border-color: #2a2a2a;
+            --sidebar-bg: linear-gradient(180deg, #0a0a0f 0%, #050508 100%);
+            --sidebar-text: #e0e0e0;
+            --accent: #4a9eff;
+            --card-bg: #2a2a2a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.2s;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 1001;
+            background: var(--accent);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            font-size: 22px;
+            cursor: pointer;
+            color: white;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .menu {
+            list-style: none;
+            padding: 16px 12px;
+        }
+
+        .menu-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+        }
+
+        .menu-item:hover { background: rgba(255,255,255,0.1); }
+        .menu-item.active { background: var(--accent); }
+        .menu-separator {
+            padding: 12px 16px 6px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+        }
+
+        .main-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .main-header h1 { font-size: 20px; font-weight: 600; }
+        .header-actions { display: flex; gap: 12px; }
+
+        .theme-toggle, .refresh-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            width: 38px;
+            height: 38px;
+            border-radius: 38px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .refresh-btn {
+            width: auto;
+            padding: 0 16px;
+            gap: 6px;
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+
+        /* Search */
+        .search-container {
+            padding: 12px 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+        }
+
+        .search-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: var(--bg-primary);
+            border-radius: 30px;
+            padding: 4px 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-box {
+            flex: 1;
+            padding: 12px 0;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .clear-search {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px;
+            display: none;
+        }
+        .clear-search.show { display: block; }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+            padding: 24px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        .stat-number { font-size: 36px; font-weight: 800; color: var(--accent); }
+
+        /* Ebook Grid */
+        .ebook-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            padding: 24px;
+        }
+        .ebook-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .ebook-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .ebook-cover {
+            height: 180px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: white;
+        }
+        .ebook-info { padding: 20px; }
+        .ebook-title { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
+        .ebook-author { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+        .ebook-category {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-table th { background: var(--bg-primary); font-weight: 600; }
+        .data-table tr:hover { background: var(--bg-primary); cursor: pointer; }
+
+        /* Reader */
+        .reader-container {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+        }
+        .reader-toolbar {
+            background: var(--bg-secondary);
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .reader-toolbar button {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+        .reader-toolbar button:hover { background: var(--accent); color: white; }
+        .reader-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .drive-embed {
+            width: 100%;
+            height: calc(100vh - 80px);
+            border: none;
+            border-radius: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 28px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header { padding: 18px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
+        .modal-body { padding: 20px; }
+        .detail-row { padding: 12px 0; border-bottom: 1px solid var(--border-color); }
+
+        /* Loading */
+        .loading, .empty-state { text-align: center; padding: 60px; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            z-index: 3000;
+            animation: fadeInOut 2s ease;
+            font-size: 13px;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: flex; }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .main { margin-left: 0; }
+            .stats-grid { grid-template-columns: 1fr; padding: 16px; }
+            .ebook-grid { grid-template-columns: 1fr; padding: 16px; }
+            .reader-container { left: 0; }
+        }
+    </style>
 </head>
 <body>
 
@@ -39,11 +420,7 @@
         </div>
 
         <div id="content">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Memuat data dari database...</p>
-                <p style="font-size:12px; margin-top:8px;">Mohon tunggu, ini hanya terjadi sekali</p>
-            </div>
+            <div class="loading"><div class="spinner"></div><p>Memuat data dari database...</p></div>
         </div>
     </main>
 </div>
@@ -58,12 +435,491 @@
     </div>
 </div>
 
-<script src="js/config.js"></script>
-<script src="js/api.js"></script>
-<script src="js/sidebar.js"></script>
-<script src="js/dashboard.js"></script>
-<script src="js/sheetViewer.js"></script>
-<script src="js/search.js"></script>
-<script src="js/app.js"></script>
+<script>
+    // ========================================
+    // KONFIGURASI
+    // ========================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5UL0HyAYtMz7MWb5kQoqmJM1PIDG1RA64AxArCAqQLs_IG/exec";
+    
+    // State
+    let allSheetsData = {};
+    let sheetsList = [];
+    let currentView = "dashboard";
+    let isDarkMode = localStorage.getItem('theme') === 'dark';
+
+    // ========================================
+    // THEME
+    // ========================================
+    function initTheme() {
+        if (isDarkMode) {
+            document.body.classList.add('dark');
+            document.getElementById('themeToggle').innerHTML = '☀️';
+        } else {
+            document.getElementById('themeToggle').innerHTML = '🌙';
+        }
+    }
+
+    function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        if (isDarkMode) {
+            document.body.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            document.getElementById('themeToggle').innerHTML = '☀️';
+        } else {
+            document.body.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            document.getElementById('themeToggle').innerHTML = '🌙';
+        }
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // ========================================
+    // API FUNCTIONS
+    // ========================================
+    async function getSheets() {
+        try {
+            const res = await fetch(`${API_URL}?action=sheets`);
+            const data = await res.json();
+            console.log("Sheets list:", data);
+            return Array.isArray(data) ? data : [];
+        } catch(e) {
+            console.error("getSheets error:", e);
+            return [];
+        }
+    }
+
+    async function getSheetData(sheetName, limit = 200) {
+        try {
+            const res = await fetch(`${API_URL}?action=data&sheet=${encodeURIComponent(sheetName)}&limit=${limit}`);
+            const data = await res.json();
+            console.log(`Data ${sheetName}:`, data);
+            
+            if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object' && !Array.isArray(data[0])) {
+                return data;
+            }
+            return [];
+        } catch(e) {
+            console.error(`getSheetData error:`, e);
+            return [];
+        }
+    }
+
+    // ========================================
+    // LOAD ALL DATA
+    // ========================================
+    async function loadAllData() {
+        const content = document.getElementById('content');
+        content.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat data...</p></div>`;
+        
+        try {
+            // Ambil daftar sheet
+            sheetsList = await getSheets();
+            console.log("Sheets:", sheetsList);
+            
+            // Ambil data setiap sheet
+            for (const sheet of sheetsList) {
+                if (sheet !== 'Dashboard') {
+                    allSheetsData[sheet] = await getSheetData(sheet, 200);
+                    console.log(`Loaded ${sheet}: ${allSheetsData[sheet].length} items`);
+                }
+            }
+            
+            // Simpan ke global
+            window.allSheetsData = allSheetsData;
+            window.sheetsList = sheetsList;
+            
+            // Load sidebar & dashboard
+            loadSidebar();
+            loadDashboard();
+            
+            console.log("All data loaded!");
+            
+        } catch(error) {
+            console.error("Load error:", error);
+            content.innerHTML = `
+                <div class="empty-state">
+                    <span style="font-size:48px;">⚠️</span>
+                    <p>Gagal memuat data</p>
+                    <p style="font-size:12px;">${error.message}</p>
+                    <button onclick="location.reload()" class="refresh-btn" style="margin-top:16px;">Refresh</button>
+                </div>
+            `;
+        }
+    }
+
+    // ========================================
+    // SIDEBAR
+    // ========================================
+    function loadSidebar() {
+        const menu = document.getElementById("sidebarMenu");
+        
+        let html = `
+            <li class="menu-item active" data-view="dashboard">
+                <span>📊</span> Dashboard
+            </li>
+            <li class="menu-item" data-view="ebook">
+                <span>📚</span> Perpustakaan
+            </li>
+        `;
+        
+        const otherSheets = sheetsList.filter(s => s !== 'Ebook' && s !== 'Dashboard');
+        if (otherSheets.length > 0) {
+            html += `<li class="menu-separator">━━ DATABASE LAIN ━━</li>`;
+            otherSheets.forEach(sheet => {
+                html += `<li class="menu-item" data-sheet="${sheet}"><span>📄</span> ${escapeHtml(sheet)}</li>`;
+            });
+        }
+        
+        menu.innerHTML = html;
+        
+        // Event listeners
+        document.querySelectorAll('.menu-item[data-view], .menu-item[data-sheet]').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+                item.classList.add('active');
+                
+                if (item.dataset.view === 'dashboard') {
+                    currentView = 'dashboard';
+                    document.getElementById('pageTitle').innerText = 'Dashboard';
+                    loadDashboard();
+                } else if (item.dataset.view === 'ebook') {
+                    currentView = 'ebook';
+                    document.getElementById('pageTitle').innerText = '📚 Perpustakaan';
+                    showEbookList();
+                } else if (item.dataset.sheet) {
+                    currentView = 'sheet';
+                    document.getElementById('pageTitle').innerText = item.dataset.sheet;
+                    loadSheet(item.dataset.sheet);
+                }
+                
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) searchInput.value = '';
+                document.getElementById('clearSearchBtn').classList.remove('show');
+                if (window.innerWidth <= 768) toggleSidebar(false);
+            });
+        });
+    }
+
+    // ========================================
+    // DASHBOARD
+    // ========================================
+    function loadDashboard() {
+        let totalItems = 0;
+        for (const sheet of sheetsList) {
+            totalItems += allSheetsData[sheet]?.length || 0;
+        }
+        
+        const html = `
+            <div style="padding:24px;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${sheetsList.filter(s => s !== 'Dashboard').length}</div>
+                        <div>Database</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${allSheetsData.Ebook?.length || 0}</div>
+                        <div>Total Ebook</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${totalItems}</div>
+                        <div>Total Items</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3 style="margin-bottom:16px;">📊 Statistik per Database</h3>
+                    ${sheetsList.filter(s => s !== 'Dashboard').map(sheet => `
+                        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                            <span>📄 ${escapeHtml(sheet)}</span>
+                            <span style="color:var(--accent);">${allSheetsData[sheet]?.length || 0} items</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        document.getElementById('content').innerHTML = html;
+    }
+
+    // ========================================
+    // EBOOK LIST
+    // ========================================
+    function showEbookList() {
+        const ebookData = allSheetsData.Ebook || [];
+        
+        if (!ebookData.length) {
+            document.getElementById('content').innerHTML = `<div class="empty-state"><span style="font-size:48px;">📚</span><p>Belum ada ebook</p></div>`;
+            return;
+        }
+        
+        let html = `<div class="ebook-grid">`;
+        ebookData.forEach((ebook, idx) => {
+            const judul = ebook.Judul || ebook.title || "Tanpa Judul";
+            const penulis = ebook.Penulis || ebook.author || "Unknown";
+            const kategori = ebook.Kategori || ebook.category || "Umum";
+            
+            html += `
+                <div class="ebook-card" onclick="openEbookReader(${idx})">
+                    <div class="ebook-cover">📖</div>
+                    <div class="ebook-info">
+                        <div class="ebook-title">${escapeHtml(judul)}</div>
+                        <div class="ebook-author">✍️ ${escapeHtml(penulis)}</div>
+                        <span class="ebook-category">📁 ${escapeHtml(kategori)}</span>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        document.getElementById('content').innerHTML = html;
+    }
+
+    // ========================================
+    // SHEET VIEWER
+    // ========================================
+    function loadSheet(sheetName) {
+        const data = allSheetsData[sheetName] || [];
+        
+        if (!data.length) {
+            document.getElementById('content').innerHTML = `<div class="empty-state"><p>Tidak ada data di ${escapeHtml(sheetName)}</p></div>`;
+            return;
+        }
+        
+        const headers = Object.keys(data[0]);
+        let html = `<div style="padding:24px; overflow-x:auto;">
+            <table class="data-table">
+                <thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')} </thead>
+                <tbody>
+        `;
+        
+        data.forEach((item, idx) => {
+            html += `<tr onclick="showDetail('${sheetName}', ${idx})">`;
+            headers.forEach(h => {
+                let val = item[h] || "";
+                val = val.length > 50 ? val.substring(0, 50) + "..." : val;
+                html += `<td>${escapeHtml(val)}</td>`;
+            });
+            html += `</tr>`;
+        });
+        
+        html += `</tbody></table></div>`;
+        document.getElementById('content').innerHTML = html;
+    }
+
+    // ========================================
+    // DETAIL MODAL
+    // ========================================
+    function showDetail(sheetName, idx) {
+        const item = allSheetsData[sheetName][idx];
+        if (!item) return;
+        
+        const modal = document.getElementById('detailModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        
+        modalTitle.innerHTML = `📋 ${escapeHtml(sheetName)}`;
+        
+        let bodyHtml = '';
+        for (const [key, val] of Object.entries(item)) {
+            let displayVal = val;
+            if (typeof val === 'string' && (val.includes('drive.google.com') || val.includes('http'))) {
+                displayVal = `<a href="${val}" target="_blank">🔗 ${escapeHtml(val)}</a>`;
+            }
+            bodyHtml += `
+                <div class="detail-row">
+                    <div style="font-weight:600; color:var(--accent); margin-bottom:4px;">${escapeHtml(key)}</div>
+                    <div>${displayVal}</div>
+                </div>
+            `;
+        }
+        modalBody.innerHTML = bodyHtml;
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('detailModal').classList.remove('active');
+    }
+
+    // ========================================
+    // EBOOK READER
+    // ========================================
+    window.openEbookReader = function(idx) {
+        const ebook = allSheetsData.Ebook?.[idx];
+        if (!ebook || !ebook.File) {
+            showToast("File tidak tersedia");
+            return;
+        }
+        
+        const judul = ebook.Judul || ebook.title || "Ebook";
+        const fileUrl = ebook.File;
+        
+        let embedUrl = fileUrl;
+        const match = fileUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) {
+            embedUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
+        }
+        
+        document.getElementById('content').style.display = 'none';
+        document.querySelector('.search-container').style.display = 'none';
+        document.getElementById('pageTitle').innerText = `📖 ${judul.substring(0, 40)}`;
+        
+        const readerHtml = `
+            <div class="reader-container" id="readerContainer">
+                <div class="reader-toolbar">
+                    <button onclick="closeEbookReader()">← Tutup Buku</button>
+                </div>
+                <div class="reader-content">
+                    <iframe src="${embedUrl}" style="width:100%; height:calc(100vh - 80px); border:none;"></iframe>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', readerHtml);
+    };
+
+    window.closeEbookReader = function() {
+        const reader = document.getElementById('readerContainer');
+        if (reader) reader.remove();
+        document.getElementById('content').style.display = 'block';
+        document.querySelector('.search-container').style.display = 'block';
+        document.getElementById('pageTitle').innerText = '📚 Perpustakaan';
+        showEbookList();
+    };
+
+    // ========================================
+    // SEARCH
+    // ========================================
+    function initSearch() {
+        const input = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        
+        input.addEventListener('input', (e) => {
+            const keyword = e.target.value;
+            
+            if (keyword.length > 0) {
+                clearBtn.classList.add('show');
+            } else {
+                clearBtn.classList.remove('show');
+            }
+            
+            if (keyword.length < 2) {
+                if (currentView === 'dashboard') loadDashboard();
+                else if (currentView === 'ebook') showEbookList();
+                else if (currentView === 'sheet') loadSheet(document.getElementById('pageTitle').innerText);
+                return;
+            }
+            
+            searchLocal(keyword);
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            clearBtn.classList.remove('show');
+            if (currentView === 'dashboard') loadDashboard();
+            else if (currentView === 'ebook') showEbookList();
+            else if (currentView === 'sheet') loadSheet(document.getElementById('pageTitle').innerText);
+        });
+    }
+
+    function searchLocal(keyword) {
+        const lowerKeyword = keyword.toLowerCase();
+        const results = [];
+        
+        for (const [sheet, data] of Object.entries(allSheetsData)) {
+            for (const item of data) {
+                let found = false;
+                for (const val of Object.values(item)) {
+                    if (val && String(val).toLowerCase().includes(lowerKeyword)) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
+                    results.push({ sheet, data: item });
+                }
+            }
+        }
+        
+        displaySearchResults(results, keyword);
+    }
+
+    function displaySearchResults(results, keyword) {
+        if (!results.length) {
+            document.getElementById('content').innerHTML = `<div class="empty-state"><p>Tidak ada hasil untuk "${escapeHtml(keyword)}"</p></div>`;
+            return;
+        }
+        
+        let html = `<div class="ebook-grid">`;
+        results.forEach(result => {
+            const title = Object.values(result.data)[0] || "Item";
+            html += `
+                <div class="ebook-card" onclick='showDetail("${result.sheet}", ${allSheetsData[result.sheet].findIndex(i => i === result.data)})'>
+                    <div class="ebook-cover">🔍</div>
+                    <div class="ebook-info">
+                        <div class="ebook-title">${escapeHtml(title)}</div>
+                        <div class="ebook-author">📁 ${escapeHtml(result.sheet)}</div>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        document.getElementById('content').innerHTML = html;
+    }
+
+    // ========================================
+    // SIDEBAR TOGGLE
+    // ========================================
+    function toggleSidebar(show) {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (show) {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        } else {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+    }
+
+    // ========================================
+    // REFRESH
+    // ========================================
+    async function refreshData() {
+        showToast("Mengambil data terbaru...");
+        await loadAllData();
+    }
+
+    // ========================================
+    // INIT
+    // ========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const overlay = document.getElementById('sidebarOverlay');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const themeToggleBtn = document.getElementById('themeToggle');
+        
+        mobileBtn.onclick = () => toggleSidebar(true);
+        overlay.onclick = () => toggleSidebar(false);
+        refreshBtn.onclick = () => refreshData();
+        themeToggleBtn.onclick = () => toggleTheme();
+        
+        initTheme();
+        loadAllData();
+        initSearch();
+    });
+</script>
 </body>
 </html>
