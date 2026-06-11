@@ -1,5 +1,3 @@
-// js/sheetViewer.js - Replace
-
 let currentSheet = null;
 let currentData = [];
 let currentHeaders = [];
@@ -62,7 +60,6 @@ function showDetailSheet(sheetName, idx) {
     let bodyHtml = '';
     for (const [key, val] of Object.entries(item)) {
         let displayVal = val;
-        // Cek apakah value adalah link Google Drive
         if (typeof val === 'string' && (val.includes('drive.google.com') || val.includes('http'))) {
             displayVal = `<a href="${val}" target="_blank">🔗 ${escapeHtml(val)}</a>`;
         }
@@ -77,7 +74,7 @@ function showDetailSheet(sheetName, idx) {
     modal.classList.add('active');
 }
 
-// Untuk menampilkan ebook di halaman Perpustakaan
+// Menampilkan ebook dashboard
 window.showEbookDashboard = function() {
     getSheetData('Ebook', 200).then(ebookData => {
         if (!ebookData.length) {
@@ -106,8 +103,6 @@ window.showEbookDashboard = function() {
         });
         html += `</div>`;
         document.getElementById('content').innerHTML = html;
-        
-        // Simpan data untuk akses global
         window.ebookData = ebookData;
     }).catch(err => {
         console.error(err);
@@ -127,14 +122,12 @@ window.openEbookReader = function(idx) {
         return;
     }
     
-    // Extract Google Drive file ID untuk embed
     let embedUrl = fileUrl;
     const match = fileUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (match) {
         embedUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
     }
     
-    // Hide main content
     document.getElementById('content').style.display = 'none';
     document.querySelector('.search-container').style.display = 'none';
     document.getElementById('pageTitle').innerText = `📖 Membaca: ${judul.substring(0, 40)}`;
