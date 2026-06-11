@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Creator Vault - Digital Library</title>
-    <!-- PDF.js via CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -262,6 +260,22 @@
         .progress-bar { height: 4px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s; }
 
+        /* Table untuk sheet lain */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .data-table th { background: var(--bg-primary); font-weight: 600; }
+        .data-table tr:hover { background: var(--bg-primary); cursor: pointer; }
+
         /* Reader Container */
         .reader-container {
             position: fixed;
@@ -301,12 +315,9 @@
             overflow-y: auto;
             padding: 20px;
         }
-        
-        /* Google Drive Embed Viewer */
         .drive-embed {
             width: 100%;
-            height: 100%;
-            min-height: 600px;
+            height: calc(100vh - 80px);
             border: none;
             border-radius: 12px;
         }
@@ -380,8 +391,7 @@
             .stats-grid { grid-template-columns: 1fr; padding: 16px; }
             .ebook-grid { grid-template-columns: 1fr; padding: 16px; }
             .reader-container { left: 0; }
-            .reader-toolbar { padding: 12px; gap: 8px; }
-            .reader-toolbar button, .reader-toolbar select { padding: 6px 12px; font-size: 11px; }
+            .data-table th, .data-table td { padding: 8px 10px; font-size: 12px; }
         }
     </style>
 </head>
@@ -418,7 +428,7 @@
         </div>
 
         <div id="content">
-            <div class="loading"><div class="spinner"></div><p>Memuat perpustakaan digital...</p></div>
+            <div class="loading"><div class="spinner"></div><p>Memuat data dari database...</p></div>
         </div>
     </main>
 </div>
@@ -449,9 +459,6 @@
     let ebookData = [];
     let currentEbookId = null;
 
-    // PDF.js worker
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
     // ========================================
     // Helper Functions
     // ========================================
@@ -477,23 +484,31 @@
         }
     }
 
-    function showToast(message, isError = false) {
+    function showToast(message) {
         const toast = document.createElement("div");
         toast.className = "toast";
-        toast.style.background = isError ? '#dc3545' : 'var(--accent)';
-        toast.textContent = isError ? `⚠️ ${message}` : `✅ ${message}`;
+        toast.textContent = message;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
+        setTimeout(() => toast.remove(), 2000);
     }
 
-    // Extract Google Drive File ID from URL
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // Extract Google Drive File ID
     function getGoogleDriveFileId(url) {
         if (!url) return null;
         const patterns = [
             /\/d\/([a-zA-Z0-9_-]+)/,
             /id=([a-zA-Z0-9_-]+)/,
-            /file\/d\/([a-zA-Z0-9_-]+)/,
-            /uc\?id=([a-zA-Z0-9_-]+)/
+            /file\/d\/([a-zA-Z0-9_-]+)/
         ];
         for (const pattern of patterns) {
             const match = url.match(pattern);
@@ -502,7 +517,6 @@
         return null;
     }
 
-    // Get Google Drive Embed URL (works for both PDF and EPUB)
     function getDriveEmbedUrl(fileUrl) {
         const fileId = getGoogleDriveFileId(fileUrl);
         if (fileId) {
@@ -526,14 +540,20 @@
         try {
             const res = await fetch(`${API_URL}?action=sheets`);
             const data = await res.json();
+            console.log("Sheets from API:", data);
             return Array.isArray(data) ? data : [];
-        } catch(e) { return []; }
+        } catch(e) {
+            console.error("getSheets error:", e);
+            return [];
+        }
     }
 
     async function getSheetData(sheetName) {
         try {
             const res = await fetch(`${API_URL}?action=data&sheet=${encodeURIComponent(sheetName)}`);
             const data = await res.json();
+            console.log(`Data for ${sheetName}:`, data);
+            
             if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
                 const headers = data[0];
                 const rows = data.slice(1);
@@ -543,41 +563,50 @@
                     return obj;
                 });
             }
+            return Array.isArray(data) ? data : [];
+        } catch(e) {
+            console.error(`getSheetData ${sheetName} error:`, e);
             return [];
-        } catch(e) { return []; }
+        }
     }
 
     // ========================================
-    // LOAD ALL DATA (ONCE)
+    // LOAD ALL DATA
     // ========================================
     async function loadAllData(showToastMsg = false) {
         if (isLoading) return;
         isLoading = true;
         
         const content = document.getElementById('content');
-        content.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat perpustakaan...</p></div>`;
+        content.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat data dari database...</p></div>`;
         
         try {
             sheetsList = await getSheets();
+            console.log("Sheets list:", sheetsList);
             
-            if (sheetsList.includes('Ebook')) {
-                ebookData = await getSheetData('Ebook');
-                console.log("Ebook loaded:", ebookData.length);
-            }
+            // Reset data
+            allSheetsData = {};
+            ebookData = [];
             
+            // Load data for all sheets
             for (const sheet of sheetsList) {
-                if (sheet !== 'Ebook' && sheet !== 'Dasbhoard') {
-                    allSheetsData[sheet] = await getSheetData(sheet);
+                const data = await getSheetData(sheet);
+                allSheetsData[sheet] = data;
+                if (sheet === 'Ebook') {
+                    ebookData = data;
                 }
             }
             
-            await loadSidebar();
-            await showEbookDashboard();
+            console.log("All sheets data loaded:", Object.keys(allSheetsData));
+            console.log("Ebook data count:", ebookData.length);
             
-            if (showToastMsg) showToast('Data diperbarui');
+            await loadSidebar();
+            await showDashboard();
+            
+            if (showToastMsg) showToast('Data berhasil dimuat');
         } catch(error) {
-            console.error(error);
-            content.innerHTML = `<div class="empty-state"><p>⚠️ Gagal memuat data</p><button class="refresh-btn" onclick="location.reload()">Refresh</button></div>`;
+            console.error("LoadAllData error:", error);
+            content.innerHTML = `<div class="empty-state"><p>⚠️ Gagal memuat data</p><p style="font-size:12px;margin-top:8px;">${error.message}</p><button class="refresh-btn" onclick="location.reload()" style="margin-top:16px;">Refresh Halaman</button></div>`;
         } finally {
             isLoading = false;
         }
@@ -589,21 +618,31 @@
     async function loadSidebar() {
         const menu = document.getElementById("sidebarMenu");
         
-        menu.innerHTML = `
+        let menuHtml = `
             <li class="menu-item" data-view="dashboard">
                 <span>📊</span> Dashboard
             </li>
-            <li class="menu-item" data-view="ebook" style="margin-bottom:12px;">
+            <li class="menu-item" data-view="ebook">
                 <span>📚</span> Perpustakaan
             </li>
-            ${sheetsList.filter(s => s !== 'Ebook' && s !== 'Dasbhoard').map(sheet => `
-                <li class="menu-separator">━━ ${escapeHtml(sheet)} ━━</li>
-                <li class="menu-item" data-sheet="${sheet}">
-                    <span>📄</span> ${escapeHtml(sheet)}
-                </li>
-            `).join('')}
         `;
         
+        // Add other sheets (excluding Ebook and Dasbhoard)
+        const otherSheets = sheetsList.filter(s => s !== 'Ebook' && s !== 'Dasbhoard');
+        if (otherSheets.length > 0) {
+            menuHtml += `<li class="menu-separator">━━ DATABASE LAIN ━━</li>`;
+            otherSheets.forEach(sheet => {
+                menuHtml += `
+                    <li class="menu-item" data-sheet="${sheet}">
+                        <span>📄</span> ${escapeHtml(sheet)}
+                    </li>
+                `;
+            });
+        }
+        
+        menu.innerHTML = menuHtml;
+        
+        // Add click handlers
         document.querySelectorAll('.menu-item[data-view], .menu-item[data-sheet]').forEach(item => {
             item.addEventListener('click', () => {
                 document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
@@ -619,8 +658,9 @@
                     showEbookDashboard();
                 } else if (item.dataset.sheet) {
                     currentView = 'sheet';
-                    document.getElementById('pageTitle').innerText = item.dataset.sheet;
-                    showSheetData(item.dataset.sheet);
+                    currentSheet = item.dataset.sheet;
+                    document.getElementById('pageTitle').innerText = currentSheet;
+                    showSheetData(currentSheet);
                 }
                 
                 const searchInput = document.getElementById('searchInput');
@@ -630,18 +670,26 @@
             });
         });
         
-        document.querySelector('.menu-item[data-view="dashboard"]').classList.add('active');
+        // Set active menu
+        const dashboardItem = document.querySelector('.menu-item[data-view="dashboard"]');
+        if (dashboardItem) dashboardItem.classList.add('active');
     }
 
     // ========================================
     // DASHBOARD
     // ========================================
     function showDashboard() {
+        const totalSheets = sheetsList.length;
         const totalEbook = ebookData.length;
-        document.getElementById('content').innerHTML = `
+        let totalItems = 0;
+        for (const sheet in allSheetsData) {
+            totalItems += allSheetsData[sheet].length;
+        }
+        
+        let statsHtml = `
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-number">${sheetsList.length}</div>
+                    <div class="stat-number">${totalSheets}</div>
                     <div>Database</div>
                 </div>
                 <div class="stat-card">
@@ -649,28 +697,34 @@
                     <div>Total Ebook</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">⚡</div>
-                    <div>Ready</div>
+                    <div class="stat-number">${totalItems}</div>
+                    <div>Total Items</div>
                 </div>
             </div>
             <div class="stat-card" style="margin:0 24px 24px 24px;">
-                <h3 style="margin-bottom:16px;">📊 Statistik Database</h3>
-                ${sheetsList.map(sheet => `
-                    <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color);">
-                        <span>📄 ${escapeHtml(sheet)}</span>
-                        <span style="color:var(--accent);">${sheet === 'Ebook' ? ebookData.length : (allSheetsData[sheet]?.length || 0)} items</span>
-                    </div>
-                `).join('')}
-            </div>
+                <h3 style="margin-bottom:16px;">📊 Statistik per Database</h3>
         `;
+        
+        for (const sheet of sheetsList) {
+            const count = allSheetsData[sheet]?.length || 0;
+            statsHtml += `
+                <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color);">
+                    <span>📄 ${escapeHtml(sheet)}</span>
+                    <span style="color:var(--accent);">${count} items</span>
+                </div>
+            `;
+        }
+        
+        statsHtml += `</div>`;
+        document.getElementById('content').innerHTML = statsHtml;
     }
 
     // ========================================
     // EBOOK DASHBOARD
     // ========================================
     function showEbookDashboard() {
-        if (!ebookData.length) {
-            document.getElementById('content').innerHTML = `<div class="empty-state"><span style="font-size:48px;">📚</span><p>Belum ada ebook di perpustakaan</p></div>`;
+        if (!ebookData || ebookData.length === 0) {
+            document.getElementById('content').innerHTML = `<div class="empty-state"><span style="font-size:48px;">📚</span><p>Belum ada ebook di perpustakaan</p><p style="font-size:12px;margin-top:8px;">Pastikan sheet 'Ebook' memiliki data di spreadsheet</p></div>`;
             return;
         }
         
@@ -708,106 +762,7 @@
     }
 
     // ========================================
-    // EBOOK READER - Menggunakan Google Drive Embed
-    // ========================================
-    async function openEbookReader(idx) {
-        const ebook = ebookData[idx];
-        if (!ebook) return;
-        
-        const id = ebook.ID || `ebook_${idx}`;
-        const judul = ebook.Judul || ebook.title || "Ebook";
-        const fileUrl = ebook.File || ebook.link || ebook.url || "";
-        
-        if (!fileUrl) {
-            showToast('File ebook tidak tersedia', true);
-            return;
-        }
-        
-        currentEbookId = id;
-        
-        // Sembunyikan main content
-        document.getElementById('content').style.display = 'none';
-        document.querySelector('.search-container').style.display = 'none';
-        
-        // Get embed URL
-        const embedUrl = getDriveEmbedUrl(fileUrl);
-        
-        const readerHtml = `
-            <div class="reader-container" id="readerContainer">
-                <div class="reader-toolbar">
-                    <button onclick="closeEbookReader()">← Tutup Buku</button>
-                    <button id="fullscreenBtn">🖥️ Layar Penuh</button>
-                    <select id="zoomSelect">
-                        <option value="100">100%</option>
-                        <option value="75">75%</option>
-                        <option value="50">50%</option>
-                        <option value="125">125%</option>
-                        <option value="150">150%</option>
-                    </select>
-                    <button id="themeReaderBtn">🎨 Mode Malam</button>
-                    <a href="${fileUrl}" target="_blank" style="text-decoration:none;"><button>💾 Download</button></a>
-                </div>
-                <div id="readerContent" class="reader-content" style="display:flex; justify-content:center; align-items:center; min-height:500px;">
-                    <iframe src="${embedUrl}" class="drive-embed" style="width:100%; height:calc(100vh - 80px); border:none;" allow="autoplay"></iframe>
-                </div>
-            </div>
-        `;
-        
-        document.body.insertAdjacentHTML('beforeend', readerHtml);
-        document.getElementById('pageTitle').innerText = `📖 Membaca: ${judul.substring(0, 40)}`;
-        
-        // Setup controls
-        const zoomSelect = document.getElementById('zoomSelect');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const themeReaderBtn = document.getElementById('themeReaderBtn');
-        const iframe = document.querySelector('#readerContainer iframe');
-        
-        if (zoomSelect) {
-            zoomSelect.onchange = (e) => {
-                const zoom = e.target.value;
-                if (iframe) iframe.style.width = `${zoom}%`;
-            };
-        }
-        
-        if (fullscreenBtn) {
-            fullscreenBtn.onclick = () => {
-                const container = document.getElementById('readerContainer');
-                if (container.requestFullscreen) {
-                    container.requestFullscreen();
-                }
-            };
-        }
-        
-        if (themeReaderBtn) {
-            themeReaderBtn.onclick = () => {
-                const readerContainer = document.getElementById('readerContainer');
-                if (readerContainer.style.background === 'rgb(26, 26, 26)' || readerContainer.style.background === '#1a1a1a') {
-                    readerContainer.style.background = 'var(--bg-primary)';
-                    readerContainer.style.color = 'var(--text-primary)';
-                } else {
-                    readerContainer.style.background = '#1a1a1a';
-                    readerContainer.style.color = '#e0e0e0';
-                }
-            };
-        }
-        
-        // Track progress based on scroll (only works for iframe content)
-        // For Google Drive embed, progress tracking is limited
-        // Save progress as "started"
-        saveProgress(currentEbookId, 10);
-    }
-    
-    function closeEbookReader() {
-        const readerContainer = document.getElementById('readerContainer');
-        if (readerContainer) readerContainer.remove();
-        document.getElementById('content').style.display = 'block';
-        document.querySelector('.search-container').style.display = 'block';
-        document.getElementById('pageTitle').innerText = '📚 Perpustakaan';
-        showEbookDashboard();
-    }
-
-    // ========================================
-    // SHEET DATA (Non-Ebook)
+    // SHEET DATA (Table View)
     // ========================================
     function showSheetData(sheetName) {
         const data = allSheetsData[sheetName] || [];
@@ -817,20 +772,30 @@
             return;
         }
         
-        let html = `<div class="ebook-grid">`;
+        // Get all headers
+        const headers = Object.keys(data[0]);
+        
+        let html = `<div style="padding:24px; overflow-x:auto;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        ${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
         data.forEach((item, idx) => {
-            const title = Object.values(item)[0] || "Item";
-            html += `
-                <div class="ebook-card" onclick="showDetailSheet('${sheetName}', ${idx})">
-                    <div class="ebook-cover" style="background:#4a9eff;">📄</div>
-                    <div class="ebook-info">
-                        <div class="ebook-title">${escapeHtml(title.substring(0, 50))}</div>
-                        <div class="ebook-author">Klik untuk lihat detail</div>
-                    </div>
-                </div>
-            `;
+            html += `<tr onclick="showDetailSheet('${sheetName}', ${idx})">`;
+            headers.forEach(h => {
+                let val = item[h] || "";
+                val = val.length > 50 ? val.substring(0, 50) + "..." : val;
+                html += `<td>${escapeHtml(val)}</td>`;
+            });
+            html += `</tr>`;
         });
-        html += `</div>`;
+        
+        html += `</tbody></table></div>`;
         document.getElementById('content').innerHTML = html;
     }
     
@@ -855,6 +820,81 @@
         }
         modalBody.innerHTML = bodyHtml;
         modal.classList.add('active');
+    }
+
+    // ========================================
+    // EBOOK READER
+    // ========================================
+    async function openEbookReader(idx) {
+        const ebook = ebookData[idx];
+        if (!ebook) return;
+        
+        const id = ebook.ID || `ebook_${idx}`;
+        const judul = ebook.Judul || ebook.title || "Ebook";
+        const fileUrl = ebook.File || ebook.link || ebook.url || "";
+        
+        if (!fileUrl) {
+            showToast('File ebook tidak tersedia');
+            return;
+        }
+        
+        currentEbookId = id;
+        
+        // Sembunyikan main content
+        document.getElementById('content').style.display = 'none';
+        document.querySelector('.search-container').style.display = 'none';
+        
+        const embedUrl = getDriveEmbedUrl(fileUrl);
+        
+        const readerHtml = `
+            <div class="reader-container" id="readerContainer">
+                <div class="reader-toolbar">
+                    <button onclick="closeEbookReader()">← Tutup Buku</button>
+                    <button id="fullscreenBtn">🖥️ Layar Penuh</button>
+                    <button id="themeReaderBtn">🎨 Mode Malam</button>
+                    <a href="${fileUrl}" target="_blank" style="text-decoration:none;"><button>💾 Download</button></a>
+                </div>
+                <div id="readerContent" class="reader-content" style="display:flex; justify-content:center; align-items:center; min-height:500px;">
+                    <iframe src="${embedUrl}" class="drive-embed" style="width:100%; height:calc(100vh - 80px); border:none;" allow="autoplay"></iframe>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', readerHtml);
+        document.getElementById('pageTitle').innerText = `📖 Membaca: ${judul.substring(0, 40)}`;
+        
+        // Setup controls
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const themeReaderBtn = document.getElementById('themeReaderBtn');
+        
+        if (fullscreenBtn) {
+            fullscreenBtn.onclick = () => {
+                const container = document.getElementById('readerContainer');
+                if (container.requestFullscreen) container.requestFullscreen();
+            };
+        }
+        
+        if (themeReaderBtn) {
+            themeReaderBtn.onclick = () => {
+                const readerContainer = document.getElementById('readerContainer');
+                if (readerContainer.style.background === 'rgb(26, 26, 26)' || readerContainer.style.background === '#1a1a1a') {
+                    readerContainer.style.background = 'var(--bg-primary)';
+                } else {
+                    readerContainer.style.background = '#1a1a1a';
+                }
+            };
+        }
+        
+        saveProgress(currentEbookId, 10);
+    }
+    
+    function closeEbookReader() {
+        const readerContainer = document.getElementById('readerContainer');
+        if (readerContainer) readerContainer.remove();
+        document.getElementById('content').style.display = 'block';
+        document.querySelector('.search-container').style.display = 'block';
+        document.getElementById('pageTitle').innerText = '📚 Perpustakaan';
+        showEbookDashboard();
     }
 
     // ========================================
@@ -883,8 +923,10 @@
                         showEbookDashboard();
                     } else if (currentView === 'dashboard') {
                         showDashboard();
-                    } else if (currentView !== 'reader') {
-                        showSheetData(currentView);
+                    } else if (currentView === 'sheet' && currentSheet) {
+                        showSheetData(currentSheet);
+                    } else {
+                        showDashboard();
                     }
                     return;
                 }
@@ -903,8 +945,10 @@
                 showEbookDashboard();
             } else if (currentView === 'dashboard') {
                 showDashboard();
-            } else if (currentView !== 'reader') {
-                showSheetData(currentView);
+            } else if (currentView === 'sheet' && currentSheet) {
+                showSheetData(currentSheet);
+            } else {
+                showDashboard();
             }
         });
     }
@@ -953,7 +997,7 @@
     // ========================================
     async function manualRefresh() {
         if (isLoading) {
-            showToast('Masih memuat...', true);
+            showToast('Masih memuat...');
             return;
         }
         showToast('Mengambil data terbaru...');
@@ -963,16 +1007,6 @@
     // ========================================
     // UTILITIES
     // ========================================
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
-    
     function toggleSidebar(show) {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
