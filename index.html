@@ -6,8 +6,6 @@
     <title>Creator Vault - Digital Library</title>
     <!-- PDF.js for PDF viewing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <!-- EPUB.js for EPUB viewing -->
-    <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -20,16 +18,17 @@
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
             --text-primary: #1a1a2e;
-            --text-secondary: #666666;
+            --text-secondary: #7a7a7a;
+            --text-muted: #9e9e9e;
             --border-color: #eef2f6;
-            --accent: #4a9eff;
-            --accent-dark: #3a7ecc;
-            --accent-light: #e8f0fe;
-            --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-            --sidebar-text: #ffffff;
-            --danger: #ff4444;
+            --accent: #ee4d2d;
+            --accent-dark: #d93a1a;
+            --accent-light: #fee9e7;
             --success: #00c851;
             --warning: #ffbb33;
+            --danger: #ff4444;
+            --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            --sidebar-text: #ffffff;
         }
 
         body.dark {
@@ -39,9 +38,8 @@
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
             --border-color: #333333;
-            --accent: #4a9eff;
-            --accent-light: #1a3a5c;
-            --sidebar-bg: linear-gradient(180deg, #0a0a0f 0%, #050508 100%);
+            --accent: #ff6347;
+            --accent-light: #3a2a2a;
         }
 
         body {
@@ -53,7 +51,7 @@
 
         /* ===== SIDEBAR (Desktop) ===== */
         .sidebar {
-            width: 280px;
+            width: 260px;
             background: var(--sidebar-bg);
             color: var(--sidebar-text);
             position: fixed;
@@ -66,8 +64,8 @@
         }
 
         .sidebar-header {
-            padding: 24px 20px;
-            font-size: 20px;
+            padding: 20px 16px;
+            font-size: 18px;
             font-weight: 700;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             display: flex;
@@ -77,19 +75,19 @@
 
         .menu {
             list-style: none;
-            padding: 16px 12px;
+            padding: 12px;
         }
 
         .menu-item {
             padding: 12px 16px;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             margin-bottom: 4px;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-weight: 500;
+            font-size: 14px;
         }
 
         .menu-item:hover {
@@ -110,17 +108,17 @@
         /* ===== MAIN CONTENT ===== */
         .main {
             flex: 1;
-            margin-left: 280px;
+            margin-left: 260px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Header */
-        .main-header {
+        /* Header Top Bar */
+        .top-bar {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
-            padding: 12px 24px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -129,7 +127,7 @@
             z-index: 100;
         }
 
-        .main-header h1 {
+        .page-title {
             font-size: 20px;
             font-weight: 600;
         }
@@ -137,9 +135,10 @@
         .header-actions {
             display: flex;
             gap: 12px;
+            align-items: center;
         }
 
-        .theme-toggle, .refresh-btn {
+        .icon-btn {
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
             width: 38px;
@@ -153,257 +152,133 @@
             transition: all 0.2s;
         }
 
-        .refresh-btn {
-            width: auto;
-            padding: 0 16px;
-            gap: 6px;
-            background: var(--accent);
-            color: white;
-            border: none;
-        }
-
-        /* Search */
-        .search-container {
-            padding: 12px 24px;
+        /* Search Bar */
+        .search-bar {
+            padding: 12px 20px;
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 60px;
-            z-index: 99;
         }
 
         .search-wrapper {
             display: flex;
-            gap: 10px;
             align-items: center;
             background: var(--bg-primary);
-            border-radius: 30px;
-            padding: 4px 16px;
-            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 16px;
+            gap: 10px;
         }
 
-        .search-box {
+        .search-wrapper span {
+            color: var(--text-secondary);
+        }
+
+        .search-wrapper input {
             flex: 1;
-            padding: 12px 0;
             border: none;
             background: transparent;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--text-primary);
             outline: none;
         }
 
-        .clear-search {
+        .search-wrapper button {
             background: none;
             border: none;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             color: var(--text-secondary);
             display: none;
         }
 
-        .clear-search.show {
+        .search-wrapper button.show {
             display: block;
         }
 
-        /* Content Area */
-        .content-area {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-        }
-
-        /* Dashboard Stats */
-        .stats-grid {
+        /* ===== DASHBOARD STATS (Like Shopee) ===== */
+        .stats-row {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent);
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--accent);
-        }
-
-        .stat-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        /* Category Grid */
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .category-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s;
-        }
-
-        .category-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent);
-            box-shadow: 0 8px 20px rgba(74,158,255,0.15);
-        }
-
-        /* PDF/EPUB Viewer */
-        .viewer-container {
-            background: var(--bg-card);
-            border-radius: 20px;
-            overflow: hidden;
-            height: calc(100vh - 200px);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .viewer-toolbar {
-            padding: 12px 20px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
             gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .viewer-toolbar button {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .viewer-toolbar button:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        .viewer-content {
-            flex: 1;
-            overflow-y: auto;
             padding: 20px;
-            background: #f0f0f0;
+            background: var(--bg-secondary);
+            margin: 16px;
+            border-radius: 12px;
         }
 
-        .pdf-page {
-            background: white;
-            margin: 0 auto 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .stat-item {
+            text-align: center;
         }
 
-        .epub-viewer {
-            background: white;
-            padding: 40px;
-            max-width: 800px;
-            margin: 0 auto;
-            font-family: Georgia, serif;
-            line-height: 1.6;
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
-        /* Search Results */
-        .search-results {
-            margin-top: 16px;
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
         }
 
-        .result-item {
+        .stat-badge {
+            font-size: 11px;
+            color: var(--accent);
+            margin-top: 4px;
+        }
+
+        /* Recommendation Cards */
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding: 0 16px;
+        }
+
+        .recom-card {
             background: var(--bg-card);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 12px;
-            cursor: pointer;
+            margin: 0 16px 12px;
             border: 1px solid var(--border-color);
-            transition: all 0.2s;
-        }
-
-        .result-item:hover {
-            border-color: var(--accent);
-        }
-
-        .result-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .result-sheet {
-            font-size: 11px;
-            color: var(--accent);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: 24px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            cursor: pointer;
         }
 
-        .modal-body {
-            padding: 20px;
+        .recom-card:hover {
+            border-color: var(--accent);
         }
 
-        .detail-row {
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .detail-label {
+        .recom-title {
             font-weight: 600;
-            color: var(--accent);
+            font-size: 14px;
+        }
+
+        .recom-desc {
             font-size: 12px;
-            margin-bottom: 4px;
+            color: var(--accent);
+            margin-top: 4px;
+        }
+
+        .recom-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Announcement Card */
+        .announce-card {
+            background: linear-gradient(135deg, var(--accent-light), var(--bg-card));
+            border-radius: 12px;
+            padding: 16px;
+            margin: 0 16px 16px;
+            border: 1px solid var(--border-color);
         }
 
         /* Bottom Navigation (Mobile) */
@@ -415,7 +290,7 @@
             right: 0;
             background: var(--bg-secondary);
             border-top: 1px solid var(--border-color);
-            padding: 8px 16px;
+            padding: 8px 12px;
             z-index: 100;
         }
 
@@ -430,46 +305,194 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            padding: 8px;
+            padding: 6px 12px;
             cursor: pointer;
-            border-radius: 12px;
+            border-radius: 8px;
             transition: all 0.2s;
             color: var(--text-secondary);
         }
 
         .bottom-nav-item.active {
             color: var(--accent);
+            background: var(--accent-light);
         }
 
         .bottom-nav-item span:first-child {
-            font-size: 22px;
+            font-size: 20px;
         }
 
         .bottom-nav-item span:last-child {
             font-size: 11px;
         }
 
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            padding: 16px;
+        }
+
+        .category-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .category-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+        }
+
+        .category-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .category-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .category-count {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Full Screen PDF Viewer */
+        .fullscreen-viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            z-index: 2000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .fullscreen-viewer.active {
+            display: flex;
+        }
+
+        .viewer-header {
+            background: #f5f5f5;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .viewer-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .viewer-controls button {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .viewer-controls button:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .viewer-content {
+            flex: 1;
+            overflow-y: auto;
+            background: #e0e0e0;
+            padding: 20px;
+        }
+
+        .pdf-page {
+            background: white;
+            margin: 0 auto 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1500;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 16px;
+        }
+
+        .detail-row {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: var(--accent);
+            margin-bottom: 4px;
+        }
+
         /* Loading */
         .loading {
             text-align: center;
-            padding: 60px;
+            padding: 40px;
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border: 3px solid var(--border-color);
             border-top: 3px solid var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin: 0 auto 16px;
+            margin: 0 auto 12px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 80px;
@@ -477,11 +500,11 @@
             transform: translateX(-50%);
             background: var(--accent);
             color: white;
-            padding: 10px 20px;
-            border-radius: 40px;
-            z-index: 3000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            z-index: 2500;
             animation: fadeInOut 2s ease;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         @keyframes fadeInOut {
@@ -491,49 +514,7 @@
             100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
 
-        /* Translate Dropdown */
-        .translate-select {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 260px;
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main {
-                margin-left: 0;
-                padding-bottom: 70px;
-            }
-            .bottom-nav {
-                display: block;
-            }
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .category-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .viewer-toolbar {
-                flex-wrap: wrap;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .mobile-menu-btn {
-                display: none;
-            }
-        }
-
+        /* Mobile */
         .mobile-menu-btn {
             display: none;
             position: fixed;
@@ -542,10 +523,10 @@
             z-index: 1001;
             background: var(--accent);
             border: none;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            font-size: 22px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 20px;
             cursor: pointer;
             color: white;
             align-items: center;
@@ -564,8 +545,44 @@
         }
 
         @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 260px;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main {
+                margin-left: 0;
+                padding-bottom: 60px;
+            }
+            .bottom-nav {
+                display: block;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                margin: 12px;
+            }
+            .category-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                padding: 12px;
+            }
             .mobile-menu-btn {
                 display: flex;
+            }
+            .top-bar {
+                padding: 10px 16px;
+            }
+            .page-title {
+                font-size: 18px;
+                margin-left: 44px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .category-grid {
+                grid-template-columns: repeat(4, 1fr);
             }
         }
     </style>
@@ -589,67 +606,75 @@
 
     <!-- Main Content -->
     <main class="main">
-        <div class="main-header">
-            <h1 id="pageTitle">Dashboard</h1>
+        <div class="top-bar">
+            <h1 class="page-title" id="pageTitle">Beranda</h1>
             <div class="header-actions">
-                <select id="translateSelect" class="translate-select">
-                    <option value="id">🇮🇩 Indonesia</option>
-                    <option value="en">🇬🇧 English</option>
-                    <option value="ar">🇸🇦 العربية</option>
-                    <option value="zh">🇨🇳 中文</option>
-                </select>
-                <button class="theme-toggle" id="themeToggle">🌙</button>
-                <button class="refresh-btn" id="refreshBtn">🔄</button>
+                <button class="icon-btn" id="themeToggle">🌙</button>
+                <button class="icon-btn" id="refreshBtn">🔄</button>
             </div>
         </div>
 
-        <div class="search-container">
+        <div class="search-bar">
             <div class="search-wrapper">
                 <span>🔍</span>
-                <input type="text" id="searchInput" class="search-box" placeholder="Cari ebook, template, atau dokumen..." autocomplete="off">
-                <button class="clear-search" id="clearSearchBtn">✕</button>
+                <input type="text" id="searchInput" placeholder="Cari produk, template, atau dokumen..." autocomplete="off">
+                <button id="clearSearchBtn">✕</button>
             </div>
             <div id="searchResults"></div>
         </div>
 
-        <div id="content" class="content-area">
-            <div class="loading"><div class="spinner"></div><p>Memuat data...</p></div>
-        </div>
+        <div id="content"></div>
     </main>
 </div>
 
 <!-- Bottom Navigation (Mobile) -->
 <div class="bottom-nav" id="bottomNav">
     <div class="bottom-nav-items">
-        <div class="bottom-nav-item" data-nav="dashboard">
+        <div class="bottom-nav-item" data-nav="beranda">
             <span>🏠</span>
             <span>Beranda</span>
         </div>
-        <div class="bottom-nav-item" data-nav="library">
-            <span>📚</span>
-            <span>Library</span>
+        <div class="bottom-nav-item" data-nav="pesanan">
+            <span>📦</span>
+            <span>Pesanan</span>
         </div>
         <div class="bottom-nav-item" data-nav="template">
             <span>💬</span>
             <span>Template</span>
         </div>
-        <div class="bottom-nav-item" data-nav="profile">
+        <div class="bottom-nav-item" data-nav="saya">
             <span>👤</span>
             <span>Saya</span>
         </div>
     </div>
 </div>
 
-<!-- PDF/EPUB Viewer Modal -->
-<div class="modal" id="viewerModal">
-    <div class="modal-content" style="max-width: 90vw; width: 90%; height: 85vh;">
+<!-- Full Screen PDF Viewer -->
+<div class="fullscreen-viewer" id="pdfViewer">
+    <div class="viewer-header">
+        <span id="pdfTitle">Dokumen</span>
+        <div class="viewer-controls">
+            <button onclick="pdfPrevPage()">◀</button>
+            <span id="pdfPageInfo">1 / 1</span>
+            <button onclick="pdfNextPage()">▶</button>
+            <button onclick="pdfZoomIn()">🔍+</button>
+            <button onclick="pdfZoomOut()">🔍-</button>
+            <button onclick="closePDFViewer()" style="background:#ff4444;color:white;">✕ Tutup</button>
+        </div>
+    </div>
+    <div class="viewer-content" id="pdfContent">
+        <div class="loading"><div class="spinner"></div><p>Memuat dokumen...</p></div>
+    </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal" id="detailModal">
+    <div class="modal-content">
         <div class="modal-header">
-            <h3 id="viewerTitle">Dokumen Viewer</h3>
-            <button onclick="closeViewer()" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
+            <h3 id="modalTitle">Detail</h3>
+            <button onclick="closeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button>
         </div>
-        <div class="modal-body" id="viewerBody" style="height: calc(100% - 70px); overflow-y: auto;">
-            <div class="loading"><div class="spinner"></div><p>Memuat dokumen...</p></div>
-        </div>
+        <div class="modal-body" id="modalBody"></div>
     </div>
 </div>
 
@@ -663,17 +688,19 @@
     let allSheetsData = {};
     let allItemsForSearch = [];
     let sheetsList = [];
-    let currentView = "dashboard";
+    let currentView = "beranda";
     let currentSheet = null;
     let isLoading = false;
     let isDarkMode = localStorage.getItem('theme') === 'dark';
-    let currentLanguage = 'id';
+    
+    // PDF State
     let pdfDoc = null;
-    let currentPage = 1;
-    let totalPages = 0;
+    let pdfCurrentPage = 1;
+    let pdfTotalPages = 0;
+    let pdfCurrentScale = 1.5;
 
     // ========================================
-    // THEME & TRANSLATE
+    // THEME
     // ========================================
     function initTheme() {
         if (isDarkMode) {
@@ -697,122 +724,79 @@
         }
     }
 
-    // Simple translate using Google Translate API
-    async function translateText(text, targetLang) {
-        if (!text || targetLang === 'id') return text;
-        try {
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data[0][0][0];
-        } catch(e) {
-            return text;
-        }
-    }
-
     // ========================================
-    // PDF & EPUB VIEWER
+    // FULL SCREEN PDF VIEWER
     // ========================================
-    async function openDocument(url, title, type) {
-        const modal = document.getElementById('viewerModal');
-        const viewerTitle = document.getElementById('viewerTitle');
-        const viewerBody = document.getElementById('viewerBody');
+    async function openPDF(url, title) {
+        const viewer = document.getElementById('pdfViewer');
+        const pdfTitle = document.getElementById('pdfTitle');
+        const pdfContent = document.getElementById('pdfContent');
         
-        viewerTitle.innerHTML = `📄 ${title}`;
-        modal.classList.add('active');
-        
-        if (type === 'pdf') {
-            await loadPDF(url, viewerBody);
-        } else if (type === 'epub') {
-            await loadEPUB(url, viewerBody);
-        } else {
-            viewerBody.innerHTML = `<iframe src="${url}" style="width:100%;height:100%;border:none;"></iframe>`;
-        }
-    }
-    
-    async function loadPDF(url, container) {
-        container.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat PDF...</p></div>`;
+        pdfTitle.innerHTML = `📄 ${title}`;
+        viewer.classList.add('active');
+        pdfContent.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat PDF...</p></div>`;
         
         try {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
             const pdf = await pdfjsLib.getDocument(url).promise;
-            totalPages = pdf.numPages;
-            
-            let html = `<div class="viewer-container"><div class="viewer-toolbar">
-                <button onclick="prevPage()">◀ Sebelumnya</button>
-                <span>Halaman <span id="pageNum">1</span> / <span id="pageCount">${totalPages}</span></span>
-                <button onclick="nextPage()">Berikutnya ▶</button>
-                <button onclick="zoomIn()">🔍 Zoom In</button>
-                <button onclick="zoomOut()">🔍 Zoom Out</button>
-            </div><div id="pdfContainer" style="text-align:center;padding:20px;"></div></div>`;
-            container.innerHTML = html;
-            
-            window.pdfDoc = pdf;
-            await renderPage(1);
+            pdfDoc = pdf;
+            pdfTotalPages = pdf.numPages;
+            pdfCurrentPage = 1;
+            document.getElementById('pdfPageInfo').innerText = `1 / ${pdfTotalPages}`;
+            await renderPDFPage();
         } catch(e) {
-            container.innerHTML = `<div class="empty-state"><p>❌ Gagal memuat PDF: ${e.message}</p></div>`;
+            pdfContent.innerHTML = `<div class="empty-state" style="text-align:center;padding:40px;"><p>❌ Gagal memuat PDF: ${e.message}</p><button onclick="closePDFViewer()" style="margin-top:16px;">Tutup</button></div>`;
         }
     }
     
-    async function renderPage(pageNum) {
-        const page = await window.pdfDoc.getPage(pageNum);
-        const scale = window.currentScale || 1.5;
-        const viewport = page.getViewport({ scale: scale });
+    async function renderPDFPage() {
+        if (!pdfDoc) return;
+        const page = await pdfDoc.getPage(pdfCurrentPage);
+        const viewport = page.getViewport({ scale: pdfCurrentScale });
         
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
         canvas.width = viewport.width;
         canvas.className = 'pdf-page';
+        canvas.style.maxWidth = '100%';
+        canvas.style.height = 'auto';
         
         await page.render({ canvasContext: context, viewport: viewport }).promise;
         
-        const container = document.getElementById('pdfContainer');
-        if (container) {
-            container.innerHTML = '';
-            container.appendChild(canvas);
-            document.getElementById('pageNum').innerText = pageNum;
+        const container = document.getElementById('pdfContent');
+        container.innerHTML = '';
+        container.appendChild(canvas);
+        document.getElementById('pdfPageInfo').innerText = `${pdfCurrentPage} / ${pdfTotalPages}`;
+    }
+    
+    function pdfPrevPage() {
+        if (pdfCurrentPage > 1) {
+            pdfCurrentPage--;
+            renderPDFPage();
         }
     }
     
-    function prevPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderPage(currentPage);
+    function pdfNextPage() {
+        if (pdfCurrentPage < pdfTotalPages) {
+            pdfCurrentPage++;
+            renderPDFPage();
         }
     }
     
-    function nextPage() {
-        if (currentPage < totalPages) {
-            currentPage++;
-            renderPage(currentPage);
-        }
+    function pdfZoomIn() {
+        pdfCurrentScale += 0.2;
+        renderPDFPage();
     }
     
-    function zoomIn() {
-        window.currentScale = (window.currentScale || 1.5) + 0.2;
-        renderPage(currentPage);
+    function pdfZoomOut() {
+        pdfCurrentScale = Math.max(0.5, pdfCurrentScale - 0.2);
+        renderPDFPage();
     }
     
-    function zoomOut() {
-        window.currentScale = Math.max(0.5, (window.currentScale || 1.5) - 0.2);
-        renderPage(currentPage);
-    }
-    
-    async function loadEPUB(url, container) {
-        container.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat EPUB...</p></div>`;
-        try {
-            const book = ePub(url);
-            const rendition = book.renderTo(container, { width: "100%", height: "100%" });
-            await rendition.display();
-        } catch(e) {
-            container.innerHTML = `<div class="empty-state"><p>❌ Gagal memuat EPUB: ${e.message}</p></div>`;
-        }
-    }
-    
-    function closeViewer() {
-        document.getElementById('viewerModal').classList.remove('active');
-        window.pdfDoc = null;
+    function closePDFViewer() {
+        document.getElementById('pdfViewer').classList.remove('active');
+        pdfDoc = null;
     }
 
     // ========================================
@@ -840,7 +824,7 @@
     }
 
     // ========================================
-    // CLIENT-SIDE SEARCH
+    // SEARCH
     // ========================================
     function searchLocal(keyword) {
         if (!keyword || keyword.length < 2) return [];
@@ -889,12 +873,12 @@
             });
             
             await loadSidebar();
-            await showDashboard();
+            await showBeranda();
             
             if (showToastMsg) showToast('✅ Data diperbarui');
         } catch(error) {
             console.error(error);
-            content.innerHTML = `<div class="empty-state"><p>⚠️ Gagal memuat data</p><button class="refresh-btn" onclick="location.reload()" style="margin-top:16px;">Refresh</button></div>`;
+            content.innerHTML = `<div class="empty-state" style="text-align:center;padding:40px;"><p>⚠️ Gagal memuat data</p><button class="recom-btn" onclick="location.reload()" style="margin-top:16px;">Refresh</button></div>`;
         } finally {
             isLoading = false;
         }
@@ -911,13 +895,13 @@
         };
         
         menu.innerHTML = `
-            <li class="menu-item" data-view="dashboard">
-                <span>📊</span> Dashboard
+            <li class="menu-item" data-view="beranda">
+                <span>🏠</span> Beranda
             </li>
-            <li class="menu-item" data-view="library">
-                <span>📚</span> Library
+            <li class="menu-item" data-view="pesanan">
+                <span>📦</span> Pesanan
             </li>
-            <li class="menu-separator">━━ DATABASE ━━</li>
+            <li class="menu-separator">━━ KATEGORI ━━</li>
             ${sheetsList.map(sheet => `
                 <li class="menu-item" data-sheet="${sheet}">
                     <span>${icons[sheet] || "📄"}</span> ${escapeHtml(sheet)}
@@ -933,14 +917,14 @@
                 const view = item.dataset.view;
                 const sheet = item.dataset.sheet;
                 
-                if (view === 'dashboard') {
-                    currentView = 'dashboard';
-                    document.getElementById('pageTitle').innerText = 'Dashboard';
-                    showDashboard();
-                } else if (view === 'library') {
-                    currentView = 'library';
-                    document.getElementById('pageTitle').innerText = 'Library';
-                    showLibrary();
+                if (view === 'beranda') {
+                    currentView = 'beranda';
+                    document.getElementById('pageTitle').innerText = 'Beranda';
+                    showBeranda();
+                } else if (view === 'pesanan') {
+                    currentView = 'pesanan';
+                    document.getElementById('pageTitle').innerText = 'Pesanan';
+                    showPesanan();
                 } else if (sheet) {
                     currentView = 'sheet';
                     currentSheet = sheet;
@@ -956,104 +940,135 @@
             });
         });
         
-        // Bottom nav handlers
+        // Bottom nav
         document.querySelectorAll('.bottom-nav-item').forEach(item => {
             item.addEventListener('click', () => {
                 const nav = item.dataset.nav;
                 document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
                 item.classList.add('active');
                 
-                if (nav === 'dashboard') {
-                    currentView = 'dashboard';
-                    document.getElementById('pageTitle').innerText = 'Dashboard';
-                    showDashboard();
-                } else if (nav === 'library') {
-                    currentView = 'library';
-                    document.getElementById('pageTitle').innerText = 'Library';
-                    showLibrary();
+                if (nav === 'beranda') {
+                    currentView = 'beranda';
+                    document.getElementById('pageTitle').innerText = 'Beranda';
+                    showBeranda();
+                } else if (nav === 'pesanan') {
+                    currentView = 'pesanan';
+                    document.getElementById('pageTitle').innerText = 'Pesanan';
+                    showPesanan();
                 } else if (nav === 'template') {
                     currentView = 'sheet';
                     currentSheet = 'TemplateChat';
                     document.getElementById('pageTitle').innerText = 'Template Chat';
                     showSheetData('TemplateChat');
-                } else if (nav === 'profile') {
+                } else if (nav === 'saya') {
                     showProfile();
                 }
             });
         });
         
-        document.querySelector('.menu-item[data-view="dashboard"]').classList.add('active');
+        document.querySelector('.menu-item[data-view="beranda"]').classList.add('active');
     }
 
     // ========================================
-    // DASHBOARD
+    // BERANDA (Like Shopee Dashboard)
     // ========================================
-    function showDashboard() {
+    function showBeranda() {
         const totalItems = Object.values(allSheetsData).reduce((sum, data) => sum + data.length, 0);
-        const ebookCount = allSheetsData['Ebook']?.length || 0;
-        const templateCount = allSheetsData['TemplateChat']?.length || 0;
-        const promptCount = allSheetsData['PromptAI']?.length || 0;
+        const needShip = allSheetsData['Pesanan']?.filter(p => p.status === 'perlu_dikirim').length || 0;
+        const cancelCount = allSheetsData['Pesanan']?.filter(p => p.status === 'batal').length || 0;
+        const returnCount = allSheetsData['Pesanan']?.filter(p => p.status === 'return').length || 0;
+        const needReview = allSheetsData['Penilaian']?.filter(p => p.status === 'perlu_dibalas').length || 0;
         
-        document.getElementById('content').innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-card" onclick="showLibrary()">
-                    <div class="stat-icon">📚</div>
-                    <div class="stat-number">${ebookCount}</div>
-                    <div>Ebook</div>
+        const html = `
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value">${needShip}</div>
+                    <div class="stat-label">Perlu Dikirim</div>
                 </div>
-                <div class="stat-card" onclick="showSheetData('TemplateChat')">
-                    <div class="stat-icon">💬</div>
-                    <div class="stat-number">${templateCount}</div>
-                    <div>Template Chat</div>
+                <div class="stat-item">
+                    <div class="stat-value">${cancelCount}</div>
+                    <div class="stat-label">Pembatalan</div>
                 </div>
-                <div class="stat-card" onclick="showSheetData('PromptAI')">
-                    <div class="stat-icon">🧠</div>
-                    <div class="stat-number">${promptCount}</div>
-                    <div>Prompt AI</div>
+                <div class="stat-item">
+                    <div class="stat-value">${returnCount}</div>
+                    <div class="stat-label">Pengembalian</div>
                 </div>
-                <div class="stat-card" onclick="showDashboard()">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-number">${sheetsList.length}</div>
-                    <div>Database</div>
+                <div class="stat-item">
+                    <div class="stat-value">${needReview}</div>
+                    <div class="stat-label">Penilaian Perlu Dibalas</div>
                 </div>
             </div>
+            
+            <div class="section-title">Rekomendasi Bisnis</div>
+            
+            <div class="recom-card" onclick="showLibrary()">
+                <div>
+                    <div class="recom-title">📚 Mulai Baca Ebook pertamamu</div>
+                    <div class="recom-desc">Dapatkan wawasan bisnis baru</div>
+                </div>
+                <button class="recom-btn">Mulai</button>
+            </div>
+            
+            <div class="recom-card" onclick="showSheetData('TemplateChat')">
+                <div>
+                    <div class="recom-title">💬 Aktifkan Template Chat untuk Tingkatkan Respon!</div>
+                    <div class="recom-desc">Balas pelanggan lebih cepat dengan template</div>
+                </div>
+                <button class="recom-btn">Gunakan</button>
+            </div>
+            
+            <div class="announce-card">
+                <div style="font-weight:600;">📢 Pengumuman Penjual</div>
+                <div style="font-size:13px;margin-top:8px;">MAU TAHU STRATEGI BERJUALAN YANG EFEKTIF?</div>
+                <div style="font-size:11px;color:var(--accent);margin-top:8px;">Klik untuk belajar →</div>
+            </div>
+            
+            <div class="section-title">Kategori Populer</div>
             <div class="category-grid">
-                ${sheetsList.map(sheet => {
-                    const icons = {"Ebook":"📚","Produk":"🛒","TemplateChat":"💬","Affiliate":"🔗","PromptAI":"🧠","IdeKonten":"💡","Notes":"📝"};
-                    return `
-                        <div class="category-card" onclick="showSheetData('${sheet}')">
-                            <div style="font-size:32px;">${icons[sheet] || "📄"}</div>
-                            <div style="font-weight:600;margin-top:8px;">${escapeHtml(sheet)}</div>
-                            <div style="font-size:11px;color:var(--accent);margin-top:4px;">${allSheetsData[sheet]?.length || 0} items</div>
-                        </div>
-                    `;
-                }).join('')}
+                <div class="category-card" onclick="showLibrary()">
+                    <div class="category-icon">📚</div>
+                    <div class="category-name">Ebook</div>
+                    <div class="category-count">${allSheetsData['Ebook']?.length || 0} item</div>
+                </div>
+                <div class="category-card" onclick="showSheetData('TemplateChat')">
+                    <div class="category-icon">💬</div>
+                    <div class="category-name">Template Chat</div>
+                    <div class="category-count">${allSheetsData['TemplateChat']?.length || 0} item</div>
+                </div>
+                <div class="category-card" onclick="showSheetData('PromptAI')">
+                    <div class="category-icon">🧠</div>
+                    <div class="category-name">Prompt AI</div>
+                    <div class="category-count">${allSheetsData['PromptAI']?.length || 0} item</div>
+                </div>
+                <div class="category-card" onclick="showSheetData('Affiliate')">
+                    <div class="category-icon">🔗</div>
+                    <div class="category-name">Affiliate</div>
+                    <div class="category-count">${allSheetsData['Affiliate']?.length || 0} item</div>
+                </div>
             </div>
         `;
+        document.getElementById('content').innerHTML = html;
     }
 
     // ========================================
-    // LIBRARY (Ebook Collection)
+    // PESANAN
     // ========================================
-    function showLibrary() {
-        const ebooks = allSheetsData['Ebook'] || [];
-        if (!ebooks.length) {
-            document.getElementById('content').innerHTML = `<div class="empty-state"><span style="font-size:48px;">📭</span><p>Belum ada ebook</p></div>`;
+    function showPesanan() {
+        const orders = allSheetsData['Pesanan'] || [];
+        if (!orders.length) {
+            document.getElementById('content').innerHTML = `<div class="empty-state" style="text-align:center;padding:40px;"><span style="font-size:48px;">📦</span><p>Belum ada pesanan</p></div>`;
             return;
         }
         
         let html = `<div class="category-grid">`;
-        ebooks.forEach((ebook, idx) => {
-            const title = ebook.judul || ebook.title || ebook.nama || `Ebook ${idx + 1}`;
-            const fileUrl = ebook.file || ebook.link || ebook.url || "";
-            const isPDF = fileUrl.includes('.pdf') || fileUrl.includes('drive.google.com');
-            const isEPUB = fileUrl.includes('.epub');
-            
+        orders.forEach((order, idx) => {
+            const title = order.produk || order.nama || `Pesanan ${idx + 1}`;
+            const status = order.status || 'Diproses';
             html += `
-                <div class="category-card" onclick="openDocument('${fileUrl}', '${escapeHtml(title)}', '${isPDF ? 'pdf' : isEPUB ? 'epub' : 'url'}')">
-                    <div style="font-size:32px;">${isPDF ? '📕' : isEPUB ? '📘' : '📖'}</div>
-                    <div style="font-weight:600;margin-top:8px;">${escapeHtml(title.substring(0, 40))}</div>
-                    <div style="font-size:11px;color:var(--text-secondary);">Klik untuk baca</div>
+                <div class="category-card" onclick="showItemDetail('Pesanan', ${idx})">
+                    <div class="category-icon">📦</div>
+                    <div class="category-name">${escapeHtml(title.substring(0, 30))}</div>
+                    <div class="category-count">${escapeHtml(status)}</div>
                 </div>
             `;
         });
@@ -1067,7 +1082,7 @@
     function showSheetData(sheetName) {
         const data = allSheetsData[sheetName] || [];
         if (!data.length) {
-            document.getElementById('content').innerHTML = `<div class="empty-state"><span style="font-size:48px;">📭</span><p>Tidak ada data</p></div>`;
+            document.getElementById('content').innerHTML = `<div class="empty-state" style="text-align:center;padding:40px;"><span style="font-size:48px;">📭</span><p>Tidak ada data</p></div>`;
             return;
         }
         
@@ -1076,9 +1091,9 @@
             const title = Object.values(item)[0] || "Item";
             html += `
                 <div class="category-card" onclick="showItemDetail('${sheetName}', ${idx})">
-                    <div style="font-size:32px;">📄</div>
-                    <div style="font-weight:600;margin-top:8px;">${escapeHtml(title.substring(0, 40))}</div>
-                    <div style="font-size:11px;color:var(--accent);">Klik untuk detail</div>
+                    <div class="category-icon">📄</div>
+                    <div class="category-name">${escapeHtml(title.substring(0, 35))}</div>
+                    <div class="category-count">Klik detail</div>
                 </div>
             `;
         });
@@ -1099,13 +1114,14 @@
         let bodyHtml = '';
         for (const [key, val] of Object.entries(item)) {
             let displayVal = escapeHtml(String(val));
-            if (typeof val === 'string' && (val.includes('.pdf') || val.includes('.epub') || val.includes('drive.google.com'))) {
-                displayVal += `<br><button class="refresh-btn" style="margin-top:8px;" onclick="openDocument('${escapeHtml(val)}', '${escapeHtml(key)}', '${val.includes('.pdf') ? 'pdf' : 'epub'}')">📖 Baca Dokumen</button>`;
+            // Check if value is a PDF link
+            if (typeof val === 'string' && (val.includes('.pdf') || val.includes('drive.google.com'))) {
+                displayVal += `<br><button class="recom-btn" style="margin-top:8px;" onclick="openPDF('${escapeHtml(val)}', '${escapeHtml(key)}')">📖 Baca PDF</button>`;
             }
             bodyHtml += `
                 <div class="detail-row">
                     <div class="detail-label">${escapeHtml(key)}</div>
-                    <div class="detail-value">${displayVal}</div>
+                    <div>${displayVal}</div>
                 </div>
             `;
         }
@@ -1114,20 +1130,42 @@
         modal.classList.add('active');
     }
     
+    function showLibrary() {
+        const ebooks = allSheetsData['Ebook'] || [];
+        if (!ebooks.length) {
+            document.getElementById('content').innerHTML = `<div class="empty-state" style="text-align:center;padding:40px;"><span style="font-size:48px;">📚</span><p>Belum ada ebook</p></div>`;
+            return;
+        }
+        
+        let html = `<div class="category-grid">`;
+        ebooks.forEach((ebook, idx) => {
+            const title = ebook.judul || ebook.title || ebook.nama || `Ebook ${idx + 1}`;
+            const fileUrl = ebook.file || ebook.link || ebook.url || "";
+            const isPDF = fileUrl.includes('.pdf') || fileUrl.includes('drive.google.com');
+            html += `
+                <div class="category-card" onclick="${isPDF ? `openPDF('${escapeHtml(fileUrl)}', '${escapeHtml(title)}')` : `showItemDetail('Ebook', ${idx})`}">
+                    <div class="category-icon">📕</div>
+                    <div class="category-name">${escapeHtml(title.substring(0, 35))}</div>
+                    <div class="category-count">Klik baca</div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        document.getElementById('content').innerHTML = html;
+    }
+    
     function showProfile() {
         const totalItems = Object.values(allSheetsData).reduce((sum, data) => sum + data.length, 0);
         document.getElementById('content').innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-number">${sheetsList.length}</div><div>Database</div></div>
-                <div class="stat-card"><div class="stat-number">${totalItems}</div><div>Total Items</div></div>
-                <div class="stat-card"><div class="stat-number">⚡</div><div>Ready</div></div>
+            <div class="stats-row">
+                <div class="stat-item"><div class="stat-value">${sheetsList.length}</div><div class="stat-label">Database</div></div>
+                <div class="stat-item"><div class="stat-value">${totalItems}</div><div class="stat-label">Total Items</div></div>
+                <div class="stat-item"><div class="stat-value">⚡</div><div class="stat-label">Ready</div></div>
             </div>
-            <div class="stat-card">
-                <h3>👤 Tentang Creator Vault</h3>
-                <p style="margin-top:12px;">Personal Knowledge Hub & Digital Library</p>
-                <p style="margin-top:8px;color:var(--text-secondary);font-size:13px;">📚 Baca ebook & dokumen</p>
-                <p style="color:var(--text-secondary);font-size:13px;">💬 Template chat untuk bisnis</p>
-                <p style="color:var(--text-secondary);font-size:13px;">🧠 Prompt AI untuk konten</p>
+            <div class="announce-card">
+                <div style="font-weight:600;">👤 Creator Vault</div>
+                <div style="font-size:13px;margin-top:8px;">Personal Knowledge Hub & Digital Library</div>
+                <div style="font-size:11px;color:var(--text-secondary);margin-top:8px;">📚 Baca ebook & dokumen<br>💬 Template chat untuk bisnis<br>🧠 Prompt AI untuk konten</div>
             </div>
         `;
     }
@@ -1156,10 +1194,10 @@
             searchDebounce = setTimeout(() => {
                 if (keyword.length === 0) {
                     resultsDiv.innerHTML = '';
-                    if (currentView === 'dashboard') showDashboard();
-                    else if (currentView === 'library') showLibrary();
+                    if (currentView === 'beranda') showBeranda();
+                    else if (currentView === 'pesanan') showPesanan();
                     else if (currentSheet) showSheetData(currentSheet);
-                    else showDashboard();
+                    else showBeranda();
                     return;
                 }
                 
@@ -1167,18 +1205,18 @@
                 
                 const results = searchLocal(keyword);
                 if (!results.length) {
-                    resultsDiv.innerHTML = `<div class="empty-state" style="padding:20px;">😕 Tidak ada hasil</div>`;
+                    resultsDiv.innerHTML = `<div style="padding:16px;text-align:center;">😕 Tidak ada hasil</div>`;
                     return;
                 }
                 
-                let html = `<div class="search-results">`;
-                results.slice(0, 30).forEach(result => {
+                let html = `<div style="padding:16px;">`;
+                results.slice(0, 20).forEach(result => {
                     const preview = Object.values(result.data)[3] || Object.values(result.data)[2] || "";
                     html += `
-                        <div class="result-item" onclick="showItemDetail('${result.sheet}', ${result.index})">
-                            <div class="result-title">📌 ${escapeHtml(result.title.substring(0, 60))}</div>
-                            <div class="result-sheet">📄 ${escapeHtml(result.sheet)}</div>
-                            <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">${escapeHtml(preview.substring(0, 80))}</div>
+                        <div class="category-card" style="margin-bottom:12px;" onclick="showItemDetail('${result.sheet}', ${result.index}); document.getElementById('searchResults').innerHTML=''; document.getElementById('searchInput').value=''">
+                            <div class="category-name">📌 ${escapeHtml(result.title.substring(0, 50))}</div>
+                            <div class="category-count">📄 ${escapeHtml(result.sheet)}</div>
+                            <div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">${escapeHtml(preview.substring(0, 60))}</div>
                         </div>
                     `;
                 });
@@ -1192,10 +1230,10 @@
             clearBtn.classList.remove('show');
             resultsDiv.innerHTML = '';
             input.focus();
-            if (currentView === 'dashboard') showDashboard();
-            else if (currentView === 'library') showLibrary();
+            if (currentView === 'beranda') showBeranda();
+            else if (currentView === 'pesanan') showPesanan();
             else if (currentSheet) showSheetData(currentSheet);
-            else showDashboard();
+            else showBeranda();
         });
     }
 
@@ -1232,39 +1270,25 @@
         showToast('🔄 Mengambil data terbaru...');
         await loadAllData(true);
     }
-
-    // Modal
-    const modal = document.createElement('div');
-    modal.className = 'modal';
-    modal.id = 'detailModal';
-    modal.innerHTML = `
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modalTitle">Detail Item</h3>
-                <button onclick="closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
-            </div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
-    `;
-    document.body.appendChild(modal);
     
     function closeModal() {
         document.getElementById('detailModal').classList.remove('active');
     }
 
     // Global functions
-    window.showDashboard = showDashboard;
-    window.showLibrary = showLibrary;
+    window.showBeranda = showBeranda;
+    window.showPesanan = showPesanan;
     window.showSheetData = showSheetData;
     window.showItemDetail = showItemDetail;
+    window.showLibrary = showLibrary;
     window.showProfile = showProfile;
     window.closeModal = closeModal;
-    window.openDocument = openDocument;
-    window.closeViewer = closeViewer;
-    window.prevPage = prevPage;
-    window.nextPage = nextPage;
-    window.zoomIn = zoomIn;
-    window.zoomOut = zoomOut;
+    window.openPDF = openPDF;
+    window.closePDFViewer = closePDFViewer;
+    window.pdfPrevPage = pdfPrevPage;
+    window.pdfNextPage = pdfNextPage;
+    window.pdfZoomIn = pdfZoomIn;
+    window.pdfZoomOut = pdfZoomOut;
     window.manualRefresh = manualRefresh;
     window.toggleTheme = toggleTheme;
     
