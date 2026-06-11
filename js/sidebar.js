@@ -2,7 +2,7 @@ async function loadSidebar() {
     const menu = document.getElementById("sidebarMenu");
     const sheets = window.sheetsList || [];
     
-    let menuHtml = `
+    let html = `
         <li class="menu-item" data-view="dashboard">
             <span>📊</span> Dashboard
         </li>
@@ -11,78 +11,124 @@ async function loadSidebar() {
         </li>
     `;
     
-    const otherSheets = sheets.filter(s => s !== 'Ebook' && s !== 'Dasbhoard');
+    const otherSheets = sheets.filter(s => s !== 'Ebook');
     if (otherSheets.length > 0) {
-        menuHtml += `<li class="menu-separator">━━ DATABASE LAIN ━━</li>`;
+        html += `<li class="menu-separator">━━ DATABASE LAIN ━━</li>`;
         otherSheets.forEach(sheet => {
-            menuHtml += `
-                <li class="menu-item" data-sheet="${sheet}">
-                    <span>📄</span> ${escapeHtml(sheet)}
-                </li>
-            `;
+            html += `<li class="menu-item" data-sheet="${sheet}"><span>📄</span> ${sheet}</li>`;
         });
     }
     
-    menu.innerHTML = menuHtml;
+    menu.innerHTML = html;
     
-    // Add click handlers
-    document.querySelectorAll('.menu-item[data-view], .menu-item[data-sheet]').forEach(item => {
+    // Event listeners
+    document.querySelectorAll('.menu-item').forEach(item => {
         item.addEventListener('click', () => {
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
             item.classList.add('active');
             
             if (item.dataset.view === 'dashboard') {
-                window.currentView = 'dashboard';
-                document.getElementById('pageTitle').innerText = 'Dashboard';
                 loadDashboard();
             } else if (item.dataset.view === 'ebook') {
-                window.currentView = 'ebook';
-                document.getElementById('pageTitle').innerText = '📚 Perpustakaan';
-                if (typeof window.showEbookDashboard === 'function') {
-                    window.showEbookDashboard();
-                } else if (typeof showEbookDashboard === 'function') {
-                    showEbookDashboard();
-                }
+                showEbookList();
             } else if (item.dataset.sheet) {
-                window.currentView = 'sheet';
-                window.currentSheet = item.dataset.sheet;
-                document.getElementById('pageTitle').innerText = window.currentSheet;
-                if (typeof loadSheet === 'function') {
-                    loadSheet(window.currentSheet);
-                }
+                loadSheet(item.dataset.sheet);
             }
-            
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) searchInput.value = '';
-            const clearBtn = document.getElementById('clearSearchBtn');
-            if (clearBtn) clearBtn.classList.remove('show');
-            if (window.innerWidth <= 768) toggleSidebar(false);
         });
     });
     
-    // Set active
+    // Active dashboard
     const dashboardItem = document.querySelector('.menu-item[data-view="dashboard"]');
     if (dashboardItem) dashboardItem.classList.add('active');
 }
 
-function toggleSidebar(show) {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    if (show) {
-        sidebar.classList.add('open');
-        overlay.classList.add('active');
-    } else {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
+function showEbookList() {
+    const ebookData = window.allSheetsData?.Ebook || [];
+    
+    if (!ebookData.length) {
+        document.getElementById('content').innerHTML = `<div class="empty-state"><span style="font-size:48px;">📚</span><p>Belum ada ebook</p></div>`;
+        return;
     }
+    
+    let html = `<div class="ebook-grid">`;
+    ebookData.forEach((ebook, idx) => {
+        const judul = ebook.Judul || ebook.title || "Tanpa Judul";
+        const penulis = ebook.Penulis || ebook.author || "Unknown";
+        const kategori = ebook.Kategori || ebook.category || "Umum";
+        
+        html += `
+            <div class="ebook-card" onclick="openEbookReader(${idx})">
+                <div class="ebook-cover">📖</div>
+                <div class="ebook-info">
+                    <div class="ebook-title">${escapeHtml(judul)}</div>
+                    <div class="ebook-author">✍️ ${escapeHtml(penulis)}</div>
+                    <span class="ebook-category">📁 ${escapeHtml(kategori)}</span>
+                </div>
+            </div>
+        `;
+    });
+    html += `</div>`;
+    document.getElementById('content').innerHTML = html;
+}
+
+function loadSheet(sheetName) {
+    const data = window.allSheetsData[sheetName] || [];
+    
+    if (!data.length) {
+        document.getElementById('content').innerHTML = `<div class="empty-state"><p>Tidak ada data di ${sheetName}</p></div>`;
+        return;
+    }
+    
+    const headers = Object.keys(data[0]);
+    let html = `<div style="padding:24px; overflow-x:auto;"><table class="data-table"><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>`;
+    
+    data.forEach(item => {
+        html += `<tr>${headers.map(h => `<td>${escapeHtml(String(item[h] || "").substring(0, 50))}</td>`).join('')}</tr>`;
+    });
+    
+    html += `</tbody></table></div>`;
+    document.getElementById('content').innerHTML = html;
 }
 
 function escapeHtml(str) {
     if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+
+window.openEbookReader = function(idx) {
+    const ebook = window.allSheetsData?.Ebook?.[idx];
+    if (!ebook || !ebook.File) {
+        alert("File tidak tersedia");
+        return;
+    }
+    
+    const fileUrl = ebook.File;
+    let embedUrl = fileUrl;
+    const match = fileUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match) {
+        embedUrl = `https://drive.google.com/file/d/${match[1]}/preview`;
+    }
+    
+    document.getElementById('content').style.display = 'none';
+    document.querySelector('.search-container').style.display = 'none';
+    
+    const readerHtml = `
+        <div class="reader-container" id="readerContainer">
+            <div class="reader-toolbar">
+                <button onclick="closeEbookReader()">← Tutup Buku</button>
+            </div>
+            <div class="reader-content">
+                <iframe src="${embedUrl}" style="width:100%; height:calc(100vh - 80px); border:none;"></iframe>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', readerHtml);
+};
+
+window.closeEbookReader = function() {
+    const reader = document.getElementById('readerContainer');
+    if (reader) reader.remove();
+    document.getElementById('content').style.display = 'block';
+    document.querySelector('.search-container').style.display = 'block';
+    showEbookList();
+};
