@@ -327,7 +327,7 @@
             line-height: 1.4;
         }
 
-        /* Context Menu (Copy Popup) */
+        /* Context Menu */
         .context-menu {
             position: fixed;
             background: var(--bg-secondary);
@@ -351,12 +351,6 @@
 
         .context-menu-item:hover {
             background: var(--hover-bg);
-        }
-
-        .context-menu-divider {
-            height: 1px;
-            background: var(--border-color);
-            margin: 4px 0;
         }
 
         /* Modal */
@@ -426,17 +420,6 @@
             line-height: 1.5;
         }
 
-        .detail-value pre {
-            background: var(--bg-primary);
-            padding: 12px;
-            border-radius: 12px;
-            overflow-x: auto;
-            font-family: monospace;
-            font-size: 13px;
-            margin-top: 6px;
-            white-space: pre-wrap;
-        }
-
         /* Loading */
         .loading, .empty-state {
             text-align: center;
@@ -477,6 +460,17 @@
             15% { opacity: 1; transform: translateX(-50%) translateY(0); }
             85% { opacity: 1; transform: translateX(-50%) translateY(0); }
             100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        /* Search Info */
+        .search-info {
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            border-radius: 20px;
+            margin-bottom: 16px;
+            display: inline-block;
         }
 
         /* Responsive */
@@ -549,10 +543,10 @@
     
     // State
     let allSheetsData = {};
+    let allItemsForSearch = []; // Flat array untuk search cepat
     let sheetsList = [];
     let currentView = "dashboard";
     let currentSheet = null;
-    let lastSearchResults = [];
     let isLoading = false;
     let isDarkMode = localStorage.getItem('theme') === 'dark';
     let autoRefreshInterval = null;
@@ -583,7 +577,7 @@
     }
 
     // ========================================
-    // COPY FUNCTION dengan Context Menu
+    // COPY FUNCTION
     // ========================================
     let currentContextMenu = null;
 
@@ -670,11 +664,30 @@
         return Array.isArray(data) ? data : [];
     }
 
-    async function searchData(keyword) {
-        if (!keyword || keyword.length < 1) return [];
-        const res = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(keyword)}`);
-        const data = await res.json();
-        return Array.isArray(data) ? data : [];
+    // ========================================
+    // CLIENT-SIDE SEARCH (Cepat, tanpa reload)
+    // ========================================
+    function searchLocal(keyword) {
+        if (!keyword || keyword.length < 2) return [];
+        
+        const lowerKeyword = keyword.toLowerCase();
+        const results = [];
+        
+        for (const item of allItemsForSearch) {
+            // Cari di semua value item
+            let found = false;
+            for (const val of Object.values(item.data)) {
+                if (val && String(val).toLowerCase().includes(lowerKeyword)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                results.push(item);
+            }
+        }
+        
+        return results;
     }
 
     // ========================================
@@ -694,8 +707,21 @@
                 return { sheet, data };
             });
             const results = await Promise.all(promises);
+            
+            // Reset search index
+            allItemsForSearch = [];
+            
             results.forEach(result => {
                 allSheetsData[result.sheet] = result.data;
+                // Build search index
+                result.data.forEach((item, idx) => {
+                    allItemsForSearch.push({
+                        sheet: result.sheet,
+                        index: idx,
+                        data: item,
+                        title: Object.values(item)[0] || "Tanpa judul"
+                    });
+                });
             });
             
             await loadSidebar();
@@ -748,6 +774,11 @@
                     document.getElementById('pageTitle').innerText = currentSheet;
                     showSheetData(currentSheet);
                 }
+                
+                // Clear search
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) searchInput.value = '';
+                document.getElementById('clearSearchBtn').classList.remove('show');
                 
                 if (window.innerWidth <= 768) toggleSidebar(false);
             });
@@ -828,7 +859,7 @@
     }
 
     // ========================================
-    // SEARCH (Realtime, tidak lompat)
+    // SEARCH (Client-side, realtime, tanpa reload)
     // ========================================
     let searchDebounce = null;
     
@@ -847,8 +878,9 @@
             
             if (searchDebounce) clearTimeout(searchDebounce);
             
-            searchDebounce = setTimeout(async () => {
+            searchDebounce = setTimeout(() => {
                 if (keyword.length === 0) {
+                    // Kembali ke view sebelumnya
                     if (currentSheet && currentView === 'sheet') {
                         showSheetData(currentSheet);
                     } else {
@@ -859,8 +891,10 @@
                 
                 if (keyword.length < 2) return;
                 
-                await performSearch(keyword);
-            }, 200);
+                // Search lokal (cepat, tanpa reload data)
+                const results = searchLocal(keyword);
+                displaySearchResults(results, keyword);
+            }, 150);
         });
         
         clearBtn.addEventListener('click', () => {
@@ -876,12 +910,8 @@
         });
     }
     
-    async function performSearch(keyword) {
+    function displaySearchResults(results, keyword) {
         const container = document.getElementById('content');
-        container.innerHTML = `<div class="loading"><div class="spinner"></div><p>Mencari "${escapeHtml(keyword)}"...</p></div>`;
-        
-        const results = await searchData(keyword);
-        lastSearchResults = results;
         currentView = 'search';
         document.getElementById('pageTitle').innerText = `Hasil: ${keyword}`;
         
@@ -890,19 +920,19 @@
             return;
         }
         
-        let html = ``;
-        results.forEach((item, idx) => {
-            const sheet = item.sheet || "Unknown";
-            const title = item.title || item.judul || item.nama || Object.values(item)[0] || "Tanpa judul";
-            const preview = (Object.values(item)[3] || Object.values(item)[2] || "").substring(0, 80);
+        let html = `<div style="margin-bottom:16px;"><div class="search-info">🔍 ${results.length} hasil ditemukan untuk "${escapeHtml(keyword)}"</div></div>`;
+        
+        results.forEach((result) => {
+            const title = result.title;
+            const preview = (Object.values(result.data)[3] || Object.values(result.data)[2] || "").substring(0, 80);
             
             html += `
-                <div class="message-item" onclick="showSearchDetail(${idx})">
+                <div class="message-item" onclick="showDetailFromSearch('${result.sheet}', ${result.index})">
                     <div class="message-avatar">🔍</div>
                     <div class="message-content">
                         <div class="message-title">
                             <span>${escapeHtml(title.substring(0, 50))}</span>
-                            <span class="message-sheet">${escapeHtml(sheet)}</span>
+                            <span class="message-sheet">${escapeHtml(result.sheet)}</span>
                         </div>
                         <div class="message-preview">${escapeHtml(preview)}</div>
                     </div>
@@ -914,13 +944,25 @@
     }
 
     // ========================================
-    // DETAIL MODAL with Click to Copy
+    // DETAIL MODAL
     // ========================================
     function showDetail(sheetName, idx) {
         const data = allSheetsData[sheetName];
         const item = data[idx];
         if (!item) return;
         
+        showModalWithItem(item, sheetName);
+    }
+    
+    function showDetailFromSearch(sheetName, idx) {
+        const data = allSheetsData[sheetName];
+        const item = data[idx];
+        if (!item) return;
+        
+        showModalWithItem(item, sheetName);
+    }
+    
+    function showModalWithItem(item, sheetName) {
         const modal = document.getElementById('detailModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
@@ -930,34 +972,6 @@
         let bodyHtml = '';
         let colIndex = 0;
         for (const [key, val] of Object.entries(item)) {
-            const label = `Kolom ${colIndex + 1} - ${key}`;
-            bodyHtml += `
-                <div class="detail-row" onclick="showContextMenu(event, '${escapeHtml(String(val)).replace(/'/g, "\\'")}', '${escapeHtml(label)}')">
-                    <div class="detail-label">${escapeHtml(key)}</div>
-                    <div class="detail-value">${escapeHtml(String(val))}</div>
-                </div>
-            `;
-            colIndex++;
-        }
-        modalBody.innerHTML = bodyHtml;
-        
-        modal.classList.add('active');
-    }
-    
-    function showSearchDetail(idx) {
-        const item = lastSearchResults[idx];
-        if (!item) return;
-        
-        const modal = document.getElementById('detailModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
-        
-        modalTitle.innerHTML = `📋 ${escapeHtml(item.sheet || 'Detail')} (Klik kolom untuk salin)`;
-        
-        let bodyHtml = '';
-        let colIndex = 0;
-        for (const [key, val] of Object.entries(item)) {
-            if (key === 'sheet') continue;
             const label = `Kolom ${colIndex + 1} - ${key}`;
             bodyHtml += `
                 <div class="detail-row" onclick="showContextMenu(event, '${escapeHtml(String(val)).replace(/'/g, "\\'")}', '${escapeHtml(label)}')">
@@ -1026,7 +1040,7 @@
     // GLOBAL FUNCTIONS
     // ========================================
     window.showDetail = showDetail;
-    window.showSearchDetail = showSearchDetail;
+    window.showDetailFromSearch = showDetailFromSearch;
     window.closeModal = closeModal;
     window.copyToClipboard = copyToClipboard;
     window.showContextMenu = showContextMenu;
