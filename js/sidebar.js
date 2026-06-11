@@ -38,7 +38,9 @@ async function loadSidebar() {
             } else if (item.dataset.view === 'ebook') {
                 window.currentView = 'ebook';
                 document.getElementById('pageTitle').innerText = '📚 Perpustakaan';
-                if (typeof showEbookDashboard === 'function') {
+                if (typeof window.showEbookDashboard === 'function') {
+                    window.showEbookDashboard();
+                } else if (typeof showEbookDashboard === 'function') {
                     showEbookDashboard();
                 }
             } else if (item.dataset.sheet) {
@@ -52,7 +54,8 @@ async function loadSidebar() {
             
             const searchInput = document.getElementById('searchInput');
             if (searchInput) searchInput.value = '';
-            document.getElementById('clearSearchBtn').classList.remove('show');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (clearBtn) clearBtn.classList.remove('show');
             if (window.innerWidth <= 768) toggleSidebar(false);
         });
     });
@@ -72,4 +75,14 @@ function toggleSidebar(show) {
         sidebar.classList.remove('open');
         overlay.classList.remove('active');
     }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
