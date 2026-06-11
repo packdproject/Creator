@@ -1,88 +1,75 @@
 async function loadSidebar() {
     const menu = document.getElementById("sidebarMenu");
-    if (!menu) return;
+    const sheets = window.sheetsList || [];
     
-    menu.innerHTML = '<li class="loading">🔄 Memuat menu...</li>';
-
-    try {
-        const sheets = await getSheets();
-        console.log("Sidebar sheets:", sheets);
-        
-        menu.innerHTML = "";
-
-        // Dashboard menu (always first)
-        const dashboardLi = document.createElement("li");
-        dashboardLi.textContent = "📊 Dashboard";
-        dashboardLi.className = "menu-item active";
-        dashboardLi.addEventListener("click", () => {
-            setActiveMenu(dashboardLi);
-            if (typeof loadDashboard === 'function') loadDashboard();
-            else console.error("loadDashboard not defined");
+    let menuHtml = `
+        <li class="menu-item" data-view="dashboard">
+            <span>📊</span> Dashboard
+        </li>
+        <li class="menu-item" data-view="ebook">
+            <span>📚</span> Perpustakaan
+        </li>
+    `;
+    
+    const otherSheets = sheets.filter(s => s !== 'Ebook' && s !== 'Dasbhoard');
+    if (otherSheets.length > 0) {
+        menuHtml += `<li class="menu-separator">━━ DATABASE LAIN ━━</li>`;
+        otherSheets.forEach(sheet => {
+            menuHtml += `
+                <li class="menu-item" data-sheet="${sheet}">
+                    <span>📄</span> ${escapeHtml(sheet)}
+                </li>
+            `;
         });
-        menu.appendChild(dashboardLi);
-
-        // Separator
-        const separator = document.createElement("li");
-        separator.textContent = "━━━━━━━━━━━━━━━━";
-        separator.className = "menu-separator";
-        menu.appendChild(separator);
-
-        // Dynamic sheets
-        if (sheets && sheets.length > 0) {
-            sheets.forEach(sheet => {
-                const li = document.createElement("li");
-                li.textContent = `📄 ${sheet}`;
-                li.className = "menu-item";
-                li.addEventListener("click", () => {
-                    setActiveMenu(li);
-                    if (typeof loadSheet === 'function') loadSheet(sheet);
-                    else console.error("loadSheet not defined");
-                });
-                menu.appendChild(li);
-            });
-        } else {
-            const emptyLi = document.createElement("li");
-            emptyLi.textContent = "⚠️ Tidak ada sheet ditemukan";
-            emptyLi.style.color = "#ff6b6b";
-            menu.appendChild(emptyLi);
-        }
-        
-        // Add refresh button at bottom
-        const refreshLi = document.createElement("li");
-        refreshLi.textContent = "🔄 Refresh Menu";
-        refreshLi.className = "menu-item";
-        refreshLi.style.marginTop = "20px";
-        refreshLi.style.borderTop = "1px solid #2a2a2a";
-        refreshLi.style.paddingTop = "12px";
-        refreshLi.addEventListener("click", async () => {
-            refreshLi.textContent = "🔄 Memuat ulang...";
-            await loadSidebar();
-        });
-        menu.appendChild(refreshLi);
-        
-    } catch (error) {
-        console.error("Error loading sidebar:", error);
-        menu.innerHTML = `<li class="error">❌ Error: ${error.message}</li>
-                          <li class="retry" onclick="loadSidebar()">🔄 Coba lagi</li>`;
     }
-}
-
-function setActiveMenu(activeItem) {
-    document.querySelectorAll(".menu-item").forEach(item => {
-        item.classList.remove("active");
+    
+    menu.innerHTML = menuHtml;
+    
+    // Add click handlers
+    document.querySelectorAll('.menu-item[data-view], .menu-item[data-sheet]').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            item.classList.add('active');
+            
+            if (item.dataset.view === 'dashboard') {
+                window.currentView = 'dashboard';
+                document.getElementById('pageTitle').innerText = 'Dashboard';
+                loadDashboard();
+            } else if (item.dataset.view === 'ebook') {
+                window.currentView = 'ebook';
+                document.getElementById('pageTitle').innerText = '📚 Perpustakaan';
+                if (typeof showEbookDashboard === 'function') {
+                    showEbookDashboard();
+                }
+            } else if (item.dataset.sheet) {
+                window.currentView = 'sheet';
+                window.currentSheet = item.dataset.sheet;
+                document.getElementById('pageTitle').innerText = window.currentSheet;
+                if (typeof loadSheet === 'function') {
+                    loadSheet(window.currentSheet);
+                }
+            }
+            
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            document.getElementById('clearSearchBtn').classList.remove('show');
+            if (window.innerWidth <= 768) toggleSidebar(false);
+        });
     });
-    activeItem.classList.add("active");
+    
+    // Set active
+    const dashboardItem = document.querySelector('.menu-item[data-view="dashboard"]');
+    if (dashboardItem) dashboardItem.classList.add('active');
 }
 
-// Auto-refresh sidebar every 30 seconds (optional)
-let sidebarRefreshInterval;
-function startSidebarAutoRefresh() {
-    if (sidebarRefreshInterval) clearInterval(sidebarRefreshInterval);
-    sidebarRefreshInterval = setInterval(() => {
-        loadSidebar();
-    }, 30000);
-}
-
-function stopSidebarAutoRefresh() {
-    if (sidebarRefreshInterval) clearInterval(sidebarRefreshInterval);
+function toggleSidebar(show) {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if (show) {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+    } else {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+    }
 }
