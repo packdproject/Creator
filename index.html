@@ -11,98 +11,68 @@
             box-sizing: border-box;
         }
 
-        /* ===== VARIABLES CSS ===== */
+        /* ===== VARIABLES ===== */
         :root {
-            /* Light Theme */
             --bg-primary: #f5f7fb;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
             --text-primary: #1a1a2e;
             --text-secondary: #666666;
-            --text-muted: #888888;
             --border-color: #eef2f6;
             --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
             --sidebar-text: #ffffff;
             --sidebar-hover: rgba(255,255,255,0.1);
             --accent: #4a9eff;
             --accent-hover: #3a7ecc;
-            --table-header: #fafbfc;
-            --table-border: #eef2f6;
-            --table-hover: #f8f9fc;
-            --modal-bg: #ffffff;
+            --message-bg: #ffffff;
+            --message-bg-own: #dcf8c6;
+            --message-text: #1a1a2e;
+            --search-bg: #ffffff;
             --shadow: rgba(0,0,0,0.04);
-            --code-bg: #f8f9fc;
         }
 
         body.dark {
-            /* Dark Theme */
-            --bg-primary: #121212;
-            --bg-secondary: #1e1e1e;
-            --bg-card: #1a1a1a;
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #1e1e1e;
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
-            --text-muted: #777777;
             --border-color: #2a2a2a;
             --sidebar-bg: linear-gradient(180deg, #0a0a0f 0%, #050508 100%);
             --sidebar-text: #e0e0e0;
-            --sidebar-hover: rgba(255,255,255,0.08);
             --accent: #4a9eff;
-            --accent-hover: #3a7ecc;
-            --table-header: #252525;
-            --table-border: #2a2a2a;
-            --table-hover: #252525;
-            --modal-bg: #1a1a1a;
-            --shadow: rgba(0,0,0,0.2);
-            --code-bg: #0d0d0d;
+            --message-bg: #2a2a2a;
+            --message-bg-own: #1e3a2a;
+            --message-text: #ffffff;
+            --search-bg: #2a2a2a;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            transition: background 0.3s ease, color 0.3s ease;
+            transition: background 0.2s, color 0.2s;
         }
 
-        /* Theme Toggle Button */
-        .theme-toggle {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            width: 40px;
-            height: 40px;
-            border-radius: 40px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            transition: all 0.2s;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.05);
-        }
-
-        /* Mobile Menu Toggle */
+        /* Mobile Menu */
         .mobile-menu-btn {
             display: none;
             position: fixed;
-            top: 16px;
-            left: 16px;
+            top: 12px;
+            left: 12px;
             z-index: 1001;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            width: 48px;
-            height: 48px;
+            background: var(--accent);
+            border: none;
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
-            color: var(--text-primary);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            color: white;
             align-items: center;
             justify-content: center;
         }
 
-        /* Sidebar Overlay */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -124,19 +94,18 @@
             left: 0;
             bottom: 0;
             overflow-y: auto;
-            transition: transform 0.3s ease, background 0.3s ease;
+            transition: transform 0.3s ease;
             z-index: 999;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
 
         .sidebar-header {
             padding: 24px 20px;
-            font-size: 22px;
-            font-weight: 800;
+            font-size: 20px;
+            font-weight: 700;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: space-between;
         }
 
         .menu {
@@ -161,293 +130,245 @@
         }
 
         .menu-item.active {
-            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-            box-shadow: 0 2px 8px rgba(74,158,255,0.3);
+            background: var(--accent);
         }
 
         .menu-separator {
             padding: 12px 16px 6px;
-            font-size: 11px;
+            font-size: 10px;
             color: rgba(255,255,255,0.4);
             letter-spacing: 1px;
-            font-weight: 500;
         }
 
         /* Main Content */
         .main {
             flex: 1;
             margin-left: 280px;
-            padding: 24px 32px;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Header */
         .main-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .main-header h1 {
-            font-size: 28px;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 20px;
+            font-weight: 600;
         }
 
         .header-actions {
             display: flex;
             gap: 12px;
+        }
+
+        .theme-toggle, .refresh-btn {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            width: 38px;
+            height: 38px;
+            border-radius: 38px;
+            cursor: pointer;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
         }
 
         .refresh-btn {
+            width: auto;
+            padding: 0 16px;
+            gap: 6px;
             background: var(--accent);
-            border: none;
-            padding: 10px 24px;
-            border-radius: 40px;
             color: white;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
+            border: none;
         }
 
-        .refresh-btn:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
+        /* Search Container - Like WhatsApp */
+        .search-container {
+            padding: 12px 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 60px;
+            z-index: 99;
         }
 
-        /* Search Box */
         .search-wrapper {
-            margin-bottom: 24px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: var(--search-bg);
+            border-radius: 30px;
+            padding: 4px 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-wrapper span {
+            font-size: 18px;
+            color: var(--text-secondary);
         }
 
         .search-box {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid var(--border-color);
-            border-radius: 14px;
+            flex: 1;
+            padding: 12px 0;
+            border: none;
+            background: transparent;
             font-size: 15px;
-            background: var(--bg-secondary);
             color: var(--text-primary);
-            transition: all 0.2s;
-        }
-
-        .search-box:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(74,158,255,0.1);
         }
 
-        /* Cards */
-        .card {
-            background: var(--bg-card);
-            border-radius: 20px;
+        .clear-search {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px;
+            display: none;
+        }
+
+        .clear-search.show {
+            display: block;
+        }
+
+        /* Dashboard Analytics */
+        .analytics-container {
             padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px var(--shadow);
-            border: 1px solid var(--border-color);
-            transition: background 0.3s ease, border 0.3s ease;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 16px;
             margin-bottom: 24px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: var(--bg-card);
             border-radius: 20px;
             padding: 24px;
             text-align: center;
-            color: white;
+            border: 1px solid var(--border-color);
         }
 
         .stat-number {
-            font-size: 40px;
+            font-size: 36px;
             font-weight: 800;
+            color: var(--accent);
         }
 
         .stat-label {
             font-size: 13px;
-            opacity: 0.8;
+            color: var(--text-secondary);
             margin-top: 6px;
         }
 
-        /* Sheet Grid */
-        .sheet-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
+        /* Chat/Message Results - Like WhatsApp/Telegram */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 24px;
+            background: var(--bg-primary);
         }
 
-        .sheet-card {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid var(--border-color);
+        .message-group {
+            margin-bottom: 24px;
+        }
+
+        .message-date {
             text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
         }
 
-        .sheet-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent);
-            box-shadow: 0 8px 20px rgba(74,158,255,0.15);
+        .message-item {
+            display: flex;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            padding: 12px;
+            border-radius: 16px;
         }
 
-        .sheet-icon {
-            font-size: 44px;
-            margin-bottom: 12px;
-        }
-
-        .sheet-name {
-            font-weight: 700;
-            font-size: 16px;
-            margin-bottom: 6px;
-        }
-
-        .sheet-count {
-            font-size: 12px;
-            color: var(--accent);
-            font-weight: 500;
-        }
-
-        /* Table Styles */
-        .table-wrapper {
+        .message-item:hover {
             background: var(--bg-card);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px var(--shadow);
-            border: 1px solid var(--border-color);
         }
 
-        .table-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
+        .message-avatar {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-title {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .message-sheet {
+            font-size: 10px;
+            color: var(--accent);
+            background: var(--bg-primary);
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .message-preview {
+            font-size: 13px;
+            color: var(--text-secondary);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
-            background: var(--table-header);
+            gap: 8px;
         }
 
-        .filter-input {
-            padding: 8px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 40px;
-            width: 250px;
-            font-size: 13px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .data-table th {
-            background: var(--table-header);
-            font-weight: 600;
-            color: var(--text-primary);
-            font-size: 13px;
-        }
-
-        .data-table td {
-            font-size: 13px;
-        }
-
-        .data-table tbody tr {
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-
-        .data-table tbody tr:hover {
-            background: var(--table-hover);
-        }
-
-        /* Copy Button */
-        .copy-btn {
+        .copy-message-btn {
             background: var(--accent);
             border: none;
-            padding: 4px 12px;
+            padding: 6px 14px;
             border-radius: 20px;
             color: white;
             cursor: pointer;
             font-size: 11px;
             transition: all 0.2s;
-            margin-left: 8px;
         }
 
-        .copy-btn:hover {
+        .copy-message-btn:hover {
             background: var(--accent-hover);
         }
 
-        .copy-success {
-            background: #28a745;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            padding: 16px;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-card);
-        }
-
-        .page-btn {
-            padding: 8px 14px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .page-btn:hover {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .page-btn.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Modal */
+        /* Detail Modal */
         .modal {
             display: none;
             position: fixed;
@@ -455,7 +376,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -466,162 +387,85 @@
         }
 
         .modal-content {
-            background: var(--modal-bg);
-            border-radius: 24px;
-            max-width: 550px;
+            background: var(--bg-card);
+            border-radius: 28px;
+            max-width: 500px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
-            border: 1px solid var(--border-color);
         }
 
         .modal-header {
-            padding: 18px 24px;
+            padding: 18px 20px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
-            background: var(--modal-bg);
-        }
-
-        .modal-header h3 {
-            font-size: 18px;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-secondary);
+            background: var(--bg-card);
         }
 
         .modal-body {
-            padding: 20px 24px;
+            padding: 20px;
         }
 
         .detail-row {
-            display: flex;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap;
         }
 
         .detail-label {
-            width: 130px;
             font-weight: 600;
             color: var(--accent);
-            font-size: 13px;
+            font-size: 12px;
+            margin-bottom: 6px;
         }
 
         .detail-value {
-            flex: 1;
+            font-size: 14px;
             word-break: break-word;
-            font-size: 13px;
-        }
-
-        .detail-value a {
-            color: var(--accent);
-            text-decoration: none;
         }
 
         .detail-value pre {
-            background: var(--code-bg);
+            background: var(--bg-primary);
             padding: 12px;
             border-radius: 12px;
             overflow-x: auto;
             font-family: monospace;
-            font-size: 12px;
-            white-space: pre-wrap;
-            margin: 8px 0;
+            font-size: 13px;
+            margin-top: 6px;
         }
 
         .modal-footer {
-            padding: 16px 24px;
+            padding: 16px 20px;
             border-top: 1px solid var(--border-color);
             text-align: right;
-            position: sticky;
-            bottom: 0;
-            background: var(--modal-bg);
         }
 
-        /* Search Results */
-        .search-results {
-            margin-top: 16px;
-        }
-
-        .result-group {
-            background: var(--bg-card);
-            border-radius: 16px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        .result-group-header {
-            padding: 14px 20px;
-            background: var(--table-header);
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .result-badge {
-            background: var(--accent);
-            color: white;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-
-        .result-item {
-            padding: 12px 20px;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: background 0.15s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .result-item:hover {
-            background: var(--table-hover);
-        }
-
-        .result-title {
-            flex: 1;
-        }
-
-        .result-copy-btn {
+        .btn-copy {
             background: var(--accent);
             border: none;
-            padding: 4px 12px;
-            border-radius: 20px;
+            padding: 8px 20px;
+            border-radius: 40px;
             color: white;
             cursor: pointer;
-            font-size: 11px;
         }
 
-        /* Loading */
-        .loading {
+        /* Loading & Empty */
+        .loading, .empty-state {
             text-align: center;
             padding: 60px;
         }
 
         .spinner {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border: 3px solid var(--border-color);
             border-top: 3px solid var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 16px;
         }
 
         @keyframes spin {
@@ -632,21 +476,22 @@
         .toast {
             position: fixed;
             bottom: 24px;
-            right: 24px;
+            left: 50%;
+            transform: translateX(-50%);
             background: var(--accent);
             color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 40px;
             z-index: 3000;
             animation: fadeInOut 2s ease;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(20px); }
-            15% { opacity: 1; transform: translateY(0); }
-            85% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
         }
 
         /* Responsive */
@@ -654,85 +499,43 @@
             .mobile-menu-btn {
                 display: flex;
             }
-
             .sidebar {
                 transform: translateX(-100%);
             }
-
             .sidebar.open {
                 transform: translateX(0);
             }
-
             .sidebar-overlay.active {
                 display: block;
             }
-
             .main {
                 margin-left: 0;
-                padding: 80px 16px 24px;
             }
-
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-
-            .sheet-grid {
-                grid-template-columns: 1fr;
+            .message-item {
+                padding: 10px;
             }
-
-            .table-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .filter-input {
-                width: 100%;
-            }
-
-            .data-table th,
-            .data-table td {
-                padding: 8px 10px;
-                font-size: 11px;
-            }
-
-            .detail-row {
-                flex-direction: column;
-            }
-
-            .detail-label {
-                width: 100%;
-                margin-bottom: 4px;
-            }
-
-            .result-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-
-        @media (min-width: 769px) and (max-width: 1024px) {
-            .main {
-                padding: 20px 24px;
-            }
-
-            .sheet-grid {
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            .message-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
             }
         }
     </style>
 </head>
 <body>
 
-<!-- Mobile Menu -->
 <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<div class="app" style="display: flex; min-height: 100vh;">
+<div style="display: flex; min-height: 100vh;">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <span>🏦</span>
-            <span>Creator Vault</span>
+            <span>🏦 Creator Vault</span>
+            <span style="font-size: 12px; opacity:0.6;">v2.0</span>
         </div>
         <ul class="menu" id="sidebarMenu">
             <li class="menu-separator">━━ MENU ━━</li>
@@ -742,24 +545,27 @@
     <!-- Main Content -->
     <main class="main">
         <div class="main-header">
-            <h1>Creator Vault</h1>
+            <h1 id="pageTitle">Dashboard</h1>
             <div class="header-actions">
                 <button class="theme-toggle" id="themeToggle">🌙</button>
-                <button class="refresh-btn" id="refreshBtn">
-                    🔄 Refresh Data
-                </button>
+                <button class="refresh-btn" id="refreshBtn">🔄</button>
             </div>
         </div>
 
-        <div class="search-wrapper">
-            <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari ebook, produk, prompt, affiliate, template chat... (min 2 karakter)">
+        <!-- Search Container -->
+        <div class="search-container">
+            <div class="search-wrapper">
+                <span>🔍</span>
+                <input type="text" id="searchInput" class="search-box" placeholder="Cari pesan atau template...">
+                <button class="clear-search" id="clearSearchBtn">✕</button>
+            </div>
         </div>
 
-        <div id="searchResults"></div>
-        <div id="content">
+        <!-- Content Area -->
+        <div id="content" class="chat-container">
             <div class="loading">
                 <div class="spinner"></div>
-                <p>Memuat data dari database...</p>
+                <p>Memuat data...</p>
             </div>
         </div>
     </main>
@@ -769,12 +575,12 @@
 <div class="modal" id="detailModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 id="modalTitle">Detail Item</h3>
-            <button class="close-modal" onclick="closeModal()">✕</button>
+            <h3 id="modalTitle">Detail Pesan</h3>
+            <button class="close-modal" onclick="closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
         </div>
         <div class="modal-body" id="modalBody"></div>
         <div class="modal-footer">
-            <button class="refresh-btn" id="modalAction" style="background:var(--accent);">Lihat Semua</button>
+            <button class="btn-copy" id="modalCopyBtn">📋 Salin Jawaban</button>
         </div>
     </div>
 </div>
@@ -788,25 +594,19 @@
     // State
     let allSheetsData = {};
     let sheetsList = [];
-    let currentSheet = null;
-    let currentData = [];
-    let currentHeaders = [];
-    let currentPage = 1;
-    let currentFilter = "";
-    let itemsPerPage = 15;
-    let lastSearchData = [];
+    let currentView = "dashboard";
+    let lastSearchResults = [];
     let isLoading = false;
     let isDarkMode = localStorage.getItem('theme') === 'dark';
 
     // ========================================
-    // THEME FUNCTIONS
+    // THEME
     // ========================================
     function initTheme() {
         if (isDarkMode) {
             document.body.classList.add('dark');
             document.getElementById('themeToggle').innerHTML = '☀️';
         } else {
-            document.body.classList.remove('dark');
             document.getElementById('themeToggle').innerHTML = '🌙';
         }
     }
@@ -825,25 +625,46 @@
     }
 
     // ========================================
-    // COPY TO CLIPBOARD FUNCTION
+    // COPY FUNCTION (Column 4 / Jawaban)
     // ========================================
-    async function copyToClipboard(text, buttonElement) {
+    async function copyAnswer(text, buttonElement) {
         try {
             await navigator.clipboard.writeText(text);
             const originalText = buttonElement.innerHTML;
             buttonElement.innerHTML = '✓ Tersalin!';
-            buttonElement.classList.add('copy-success');
             setTimeout(() => {
                 buttonElement.innerHTML = originalText;
-                buttonElement.classList.remove('copy-success');
-            }, 2000);
-            showNotification('✅ Jawaban tersalin ke clipboard!');
-        } catch (err) {
-            showNotification('❌ Gagal menyalin');
+            }, 1500);
+            showToast('✅ Jawaban tersalin!');
+        } catch(err) {
+            showToast('❌ Gagal menyalin');
         }
     }
 
-    function showNotification(message) {
+    function getAnswerFromItem(item) {
+        // Cari kolom ke-4 atau field jawaban
+        const values = Object.values(item);
+        // Kolom ke-4 (index 3) jika ada
+        if (values.length >= 4) {
+            return values[3] || values[2] || values[1] || "";
+        }
+        // Atau cari field yang mengandung kata jawaban/answer
+        for (let [key, val] of Object.entries(item)) {
+            if (key.toLowerCase().includes('jawab') || key.toLowerCase().includes('answer')) {
+                return val || "";
+            }
+        }
+        // Ambil field terpanjang sebagai konten
+        let longest = "";
+        for (let val of values) {
+            if (typeof val === 'string' && val.length > longest.length && val.length > 20) {
+                longest = val;
+            }
+        }
+        return longest || values[1] || "";
+    }
+
+    function showToast(message) {
         const toast = document.createElement("div");
         toast.className = "toast";
         toast.textContent = message;
@@ -855,15 +676,14 @@
     // API FUNCTIONS
     // ========================================
     async function getSheets() {
-        const response = await fetch(`${API_URL}?action=sheets`);
-        const data = await response.json();
-        return Array.isArray(data) ? data : ["Ebook", "Produk", "TemplateChat", "Affiliate", "PromptAI", "IdeKonten", "Notes"];
+        const res = await fetch(`${API_URL}?action=sheets`);
+        const data = await res.json();
+        return Array.isArray(data) ? data : [];
     }
 
     async function getSheetData(sheetName) {
-        const response = await fetch(`${API_URL}?action=data&sheet=${encodeURIComponent(sheetName)}`);
-        const data = await response.json();
-        
+        const res = await fetch(`${API_URL}?action=data&sheet=${encodeURIComponent(sheetName)}`);
+        const data = await res.json();
         if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
             const headers = data[0];
             const rows = data.slice(1);
@@ -873,536 +693,386 @@
                 return obj;
             });
         }
-        
-        if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object') {
-            return data;
-        }
-        
-        return [];
+        return Array.isArray(data) ? data : [];
     }
 
     async function searchData(keyword) {
         if (!keyword || keyword.length < 2) return [];
-        const response = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(keyword)}`);
-        const data = await response.json();
+        const res = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(keyword)}`);
+        const data = await res.json();
         return Array.isArray(data) ? data : [];
     }
 
     // ========================================
     // LOAD ALL DATA
     // ========================================
-    async function loadAllData(showToast = false) {
+    async function loadAllData(showToastMsg = false) {
         if (isLoading) return;
         isLoading = true;
         
-        const content = document.getElementById("content");
-        content.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat semua data...</p></div>`;
-        
         try {
             sheetsList = await getSheets();
-            
             const promises = sheetsList.map(async sheet => {
                 const data = await getSheetData(sheet);
                 return { sheet, data };
             });
-            
             const results = await Promise.all(promises);
-            
             results.forEach(result => {
                 allSheetsData[result.sheet] = result.data;
             });
             
             await loadSidebar();
-            await loadDashboard();
+            await showDashboard();
             
-            if (showToast) {
-                showNotification("✅ Data berhasil diperbarui!");
-            }
-        } catch (error) {
+            if (showToastMsg) showToast('✅ Data diperbarui');
+        } catch(error) {
             console.error(error);
-            content.innerHTML = `<div class="card" style="text-align:center;"><h3>⚠️ Gagal memuat data</h3><p>${error.message}</p><button class="refresh-btn" onclick="location.reload()">Refresh Halaman</button></div>`;
+            document.getElementById('content').innerHTML = `<div class="empty-state"><p>⚠️ Gagal memuat data</p><button class="refresh-btn" onclick="location.reload()" style="margin-top:16px;">Refresh</button></div>`;
         } finally {
             isLoading = false;
         }
     }
 
     // ========================================
-    // SIDEBAR (Premium Icons)
+    // SIDEBAR
     // ========================================
     async function loadSidebar() {
         const menu = document.getElementById("sidebarMenu");
-        
-        const premiumIcons = {
-            "Dashboard": "✨",
-            "Ebook": "📚", "Produk": "🛒", "Pelanggan": "👥", "TemplateChat": "💬",
-            "Affiliate": "🔗", "PromptAI": "🧠", "IdeKonten": "💡", "Notes": "📝",
-            "ReadingProgress": "📖", "Bookmarks": "🔖", "Highlights": "⭐"
-        };
-        
-        menu.innerHTML = `
-            <li class="menu-item" data-sheet="dashboard" style="margin-bottom:12px;">
-                <span>✨</span> Dashboard
-            </li>
-            <li class="menu-separator">━━ DATABASE ━━</li>
-            ${sheetsList.map(sheet => `
-                <li class="menu-item" data-sheet="${sheet}">
-                    <span>${premiumIcons[sheet] || "📄"}</span> ${escapeHtml(sheet)}
-                </li>
-            `).join('')}
-        `;
-        
-        document.querySelectorAll('.menu-item[data-sheet]').forEach(item => {
-            item.addEventListener('click', () => {
-                const sheet = item.dataset.sheet;
-                document.querySelectorAll('.menu-item[data-sheet]').forEach(m => m.classList.remove('active'));
-                item.classList.add('active');
-                
-                if (sheet === 'dashboard') {
-                    loadDashboard();
-                } else {
-                    loadSheet(sheet);
-                }
-                
-                if (window.innerWidth <= 768) {
-                    toggleSidebar(false);
-                }
-            });
-        });
-        
-        const dashboardItem = document.querySelector('.menu-item[data-sheet="dashboard"]');
-        if (dashboardItem) dashboardItem.classList.add('active');
-    }
-
-    // ========================================
-    // DASHBOARD
-    // ========================================
-    function loadDashboard() {
-        currentSheet = null;
-        document.getElementById("searchResults").innerHTML = "";
-        document.getElementById("searchInput").value = "";
-        
-        const totalItems = Object.values(allSheetsData).reduce((sum, data) => sum + data.length, 0);
-        
-        const premiumIcons = {
+        const icons = {
             "Ebook": "📚", "Produk": "🛒", "Pelanggan": "👥", "TemplateChat": "💬",
             "Affiliate": "🔗", "PromptAI": "🧠", "IdeKonten": "💡", "Notes": "📝"
         };
         
-        const content = document.getElementById("content");
-        content.innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">${sheetsList.length}</div>
-                    <div class="stat-label">Database</div>
+        menu.innerHTML = `
+            <li class="menu-item" data-view="dashboard">
+                <span>📊</span> Dashboard
+            </li>
+            <li class="menu-separator">━━ DATABASE ━━</li>
+            ${sheetsList.map(sheet => `
+                <li class="menu-item" data-sheet="${sheet}">
+                    <span>${icons[sheet] || "📄"}</span> ${escapeHtml(sheet)}
+                </li>
+            `).join('')}
+        `;
+        
+        document.querySelectorAll('.menu-item[data-view], .menu-item[data-sheet]').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+                item.classList.add('active');
+                
+                if (item.dataset.view === 'dashboard') {
+                    currentView = 'dashboard';
+                    document.getElementById('pageTitle').innerText = 'Dashboard';
+                    showDashboard();
+                } else if (item.dataset.sheet) {
+                    currentView = 'sheet';
+                    document.getElementById('pageTitle').innerText = item.dataset.sheet;
+                    showSheetData(item.dataset.sheet);
+                }
+                
+                if (window.innerWidth <= 768) toggleSidebar(false);
+            });
+        });
+        
+        document.querySelector('.menu-item[data-view="dashboard"]').classList.add('active');
+    }
+
+    // ========================================
+    // DASHBOARD (Analytics Only)
+    // ========================================
+    function showDashboard() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('clearSearchBtn').classList.remove('show');
+        
+        const totalItems = Object.values(allSheetsData).reduce((sum, data) => sum + data.length, 0);
+        
+        document.getElementById('content').innerHTML = `
+            <div class="analytics-container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${sheetsList.length}</div>
+                        <div class="stat-label">Database</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${totalItems}</div>
+                        <div class="stat-label">Total Items</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">⚡</div>
+                        <div class="stat-label">Real-time</div>
+                    </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">${totalItems}</div>
-                    <div class="stat-label">Total Items</div>
+                    <h3 style="margin-bottom:16px;">📊 Statistik per Database</h3>
+                    ${sheetsList.map(sheet => `
+                        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                            <span>📄 ${escapeHtml(sheet)}</span>
+                            <span style="color:var(--accent);">${allSheetsData[sheet]?.length || 0} items</span>
+                        </div>
+                    `).join('')}
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number">⚡</div>
-                    <div class="stat-label">Ready</div>
-                </div>
-            </div>
-            <div class="card">
-                <h3>📚 Semua Database</h3>
-                <div class="sheet-grid">
-                    ${sheetsList.map(sheet => {
-                        const count = allSheetsData[sheet]?.length || 0;
-                        return `
-                            <div class="sheet-card" onclick="loadSheet('${sheet}')">
-                                <div class="sheet-icon">${premiumIcons[sheet] || "📄"}</div>
-                                <div class="sheet-name">${escapeHtml(sheet)}</div>
-                                <div class="sheet-count">📊 ${count} items</div>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-            </div>
-            <div class="card">
-                <h3>💡 Panduan Cepat</h3>
-                <ul style="margin-left:20px;color:var(--text-secondary);">
-                    <li>🔍 Gunakan search untuk mencari ke semua database</li>
-                    <li>📄 Klik sheet di sidebar atau dashboard untuk melihat data</li>
-                    <li>👆 Klik baris tabel untuk melihat detail lengkap</li>
-                    <li>📋 Klik tombol "Salin" untuk menyalin jawaban template chat</li>
-                    <li>🔄 Klik "Refresh Data" untuk update dari database</li>
-                    <li>🌙 Klik icon bulan/matahari untuk ganti tema</li>
-                </ul>
             </div>
         `;
     }
 
     // ========================================
-    // SHEET VIEWER with Copy Button
+    // SHEET DATA (Chat Style)
     // ========================================
-    function loadSheet(sheetName) {
-        currentSheet = sheetName;
-        currentPage = 1;
-        currentFilter = "";
-        
+    function showSheetData(sheetName) {
         const data = allSheetsData[sheetName] || [];
-        currentData = data;
-        
-        if (currentData.length > 0) {
-            currentHeaders = Object.keys(currentData[0]);
-        }
-        
-        renderTableView();
-        document.getElementById("searchResults").innerHTML = "";
-        document.getElementById("searchInput").value = "";
+        renderChatMessages(data, sheetName);
     }
-    
-    function renderTableView() {
-        const content = document.getElementById("content");
+
+    function renderChatMessages(data, sheetName) {
+        const container = document.getElementById('content');
         
-        if (!currentData.length) {
-            content.innerHTML = `
-                <div class="card" style="text-align:center;padding:60px;">
-                    <div style="font-size:48px;">📭</div>
-                    <h3>${escapeHtml(currentSheet)}</h3>
-                    <p>Tidak ada data di sheet ini</p>
-                    <button class="refresh-btn" onclick="loadDashboard()" style="margin-top:16px;">Kembali ke Dashboard</button>
-                </div>
-            `;
+        if (!data.length) {
+            container.innerHTML = `<div class="empty-state"><span style="font-size:48px;">📭</span><p>Tidak ada data</p></div>`;
             return;
         }
         
-        let filteredData = [...currentData];
-        if (currentFilter) {
-            filteredData = currentData.filter(row => 
-                JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
-            );
-        }
+        let html = `<div class="chat-container">`;
         
-        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-        const start = (currentPage - 1) * itemsPerPage;
-        const pageData = filteredData.slice(start, start + itemsPerPage);
-        
-        let html = `
-            <div class="table-wrapper">
-                <div class="table-header">
-                    <div>
-                        <h3>📄 ${escapeHtml(currentSheet)}</h3>
-                        <span style="color:var(--accent);font-size:13px;">${filteredData.length} item ditemukan</span>
+        data.forEach((item, idx) => {
+            const title = Object.values(item)[0] || "Tanpa judul";
+            const answer = getAnswerFromItem(item);
+            const preview = answer.substring(0, 100) + (answer.length > 100 ? '...' : '');
+            
+            html += `
+                <div class="message-item" onclick="showDetail('${sheetName}', ${idx})">
+                    <div class="message-avatar">💬</div>
+                    <div class="message-content">
+                        <div class="message-title">
+                            <span>${escapeHtml(title.substring(0, 50))}</span>
+                            <span class="message-sheet">${escapeHtml(sheetName)}</span>
+                        </div>
+                        <div class="message-preview">
+                            <span>${escapeHtml(preview)}</span>
+                            <button class="copy-message-btn" onclick="event.stopPropagation(); copyAnswer('${escapeHtml(answer).replace(/'/g, "\\'")}', this)">📋 Salin</button>
+                        </div>
                     </div>
-                    <div>
-                        <input type="text" class="filter-input" id="filterInput" placeholder="🔍 Filter data..." value="${escapeHtml(currentFilter)}">
-                    </div>
-                </div>
-                <div style="overflow-x:auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                ${currentHeaders.map(h => `<th>${escapeHtml(h)}</th>`).join('')}
-                                <th style="width:80px">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${pageData.map((row, idx) => `
-                                <tr>
-                                    ${currentHeaders.map(h => `<td>${escapeHtml(String(row[h] || '').substring(0, 50))}${String(row[h] || '').length > 50 ? '...' : ''}</td>`).join('')}
-                                    <td>
-                                        <button class="copy-btn" onclick="event.stopPropagation(); copyRowData(${start + idx})">📋 Salin</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-        `;
-        
-        if (totalPages > 1) {
-            html += `<div class="pagination">`;
-            html += `<button class="page-btn" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>◀</button>`;
-            
-            let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, currentPage + 2);
-            
-            if (startPage > 1) html += `<button class="page-btn" onclick="goToPage(1)">1</button>${startPage > 2 ? '<span>...</span>' : ''}`;
-            for (let i = startPage; i <= endPage; i++) {
-                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
-            }
-            if (endPage < totalPages) html += `${endPage < totalPages - 1 ? '<span>...</span>' : ''}<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
-            
-            html += `<button class="page-btn" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>▶</button>`;
-            html += `</div>`;
-        }
-        
-        html += `</div>`;
-        content.innerHTML = html;
-        
-        const filterInput = document.getElementById("filterInput");
-        if (filterInput) {
-            filterInput.onkeyup = (e) => {
-                currentFilter = e.target.value;
-                currentPage = 1;
-                renderTableView();
-            };
-        }
-    }
-    
-    function copyRowData(index) {
-        let filteredData = [...currentData];
-        if (currentFilter) {
-            filteredData = currentData.filter(row => 
-                JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
-            );
-        }
-        const item = filteredData[index];
-        if (!item) return;
-        
-        // Extract the main answer/content for TemplateChat sheet
-        let textToCopy = "";
-        if (currentSheet === "TemplateChat") {
-            textToCopy = item["jawaban"] || item["answer"] || item["Jawaban"] || item["Answer"] || item["content"] || JSON.stringify(item, null, 2);
-        } else {
-            textToCopy = item["jawaban"] || item["answer"] || item["Jawaban"] || item["Answer"] || item["content"] || item["deskripsi"] || item["Deskripsi"] || JSON.stringify(item, null, 2);
-        }
-        
-        copyToClipboard(textToCopy, event.target);
-    }
-    
-    function changePage(delta) {
-        let filteredData = [...currentData];
-        if (currentFilter) {
-            filteredData = currentData.filter(row => 
-                JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
-            );
-        }
-        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-        currentPage = Math.min(Math.max(1, currentPage + delta), totalPages);
-        renderTableView();
-    }
-    
-    function goToPage(page) {
-        currentPage = page;
-        renderTableView();
-    }
-    
-    function showDetail(index) {
-        let filteredData = [...currentData];
-        if (currentFilter) {
-            filteredData = currentData.filter(row => 
-                JSON.stringify(row).toLowerCase().includes(currentFilter.toLowerCase())
-            );
-        }
-        const item = filteredData[index];
-        if (!item) return;
-        
-        const modal = document.getElementById("detailModal");
-        const modalTitle = document.getElementById("modalTitle");
-        const modalBody = document.getElementById("modalBody");
-        const modalAction = document.getElementById("modalAction");
-        
-        modalTitle.innerHTML = `📋 Detail - ${escapeHtml(currentSheet)}`;
-        
-        let bodyHtml = "";
-        for (const [key, val] of Object.entries(item)) {
-            let valueHtml = isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : escapeHtml(String(val));
-            
-            // Add copy button for answer fields in TemplateChat
-            if (currentSheet === "TemplateChat" && (key.toLowerCase().includes("jawab") || key.toLowerCase().includes("answer"))) {
-                valueHtml += `<button class="copy-btn" onclick="copyToClipboard('${escapeHtml(String(val)).replace(/'/g, "\\'")}', this)" style="margin-left:12px;">📋 Salin Jawaban</button>`;
-            }
-            
-            bodyHtml += `
-                <div class="detail-row">
-                    <div class="detail-label">${escapeHtml(key)}</div>
-                    <div class="detail-value">${valueHtml}</div>
                 </div>
             `;
-        }
-        modalBody.innerHTML = bodyHtml;
+        });
         
-        modalAction.onclick = () => {
-            closeModal();
-            loadSheet(currentSheet);
-        };
-        modalAction.innerHTML = `📄 Lihat semua di ${escapeHtml(currentSheet)}`;
-        
-        modal.classList.add("active");
-    }
-    
-    function closeModal() {
-        document.getElementById("detailModal").classList.remove("active");
+        html += `</div>`;
+        container.innerHTML = html;
     }
 
     // ========================================
-    // SEARCH with Copy Button
+    // SEARCH (Chat Style Results)
     // ========================================
     let searchTimeout;
     
     function initSearch() {
-        const input = document.getElementById("searchInput");
-        input.addEventListener("input", async () => {
+        const input = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearSearchBtn');
+        
+        input.addEventListener('input', () => {
             clearTimeout(searchTimeout);
             const keyword = input.value.trim();
-            const resultsDiv = document.getElementById("searchResults");
+            
+            if (keyword.length > 0) {
+                clearBtn.classList.add('show');
+            } else {
+                clearBtn.classList.remove('show');
+            }
             
             if (keyword.length < 2) {
-                resultsDiv.innerHTML = "";
+                if (currentView === 'dashboard') {
+                    showDashboard();
+                } else if (currentView !== 'dashboard' && currentView !== 'search') {
+                    showSheetData(currentView);
+                } else {
+                    showDashboard();
+                }
                 return;
             }
             
             searchTimeout = setTimeout(async () => {
-                resultsDiv.innerHTML = `<div class="loading" style="padding:20px;"><div class="spinner" style="width:30px;height:30px;"></div><p>Mencari...</p></div>`;
-                
-                const data = await searchData(keyword);
-                lastSearchData = data;
-                
-                if (!data.length) {
-                    resultsDiv.innerHTML = `<div class="card" style="text-align:center;">😕 Tidak ada hasil untuk "${escapeHtml(keyword)}"</div>`;
-                    return;
-                }
-                
-                const grouped = {};
-                data.forEach(item => {
-                    const sheet = item.sheet || "Unknown";
-                    if (!grouped[sheet]) grouped[sheet] = [];
-                    grouped[sheet].push(item);
-                });
-                
-                let html = `<div class="card"><h3>🔍 Hasil: "${escapeHtml(keyword)}"</h3><p>${data.length} hasil ditemukan</p>`;
-                for (const [sheet, items] of Object.entries(grouped)) {
-                    html += `
-                        <div class="result-group">
-                            <div class="result-group-header" onclick="loadSheet('${sheet}')">
-                                <span>📄 ${escapeHtml(sheet)}</span>
-                                <span class="result-badge">${items.length}</span>
-                            </div>
-                    `;
-                    items.slice(0, 5).forEach((item, idx) => {
-                        const title = item.title || item.judul || item.nama || item["jawaban"] || Object.values(item)[0] || "Tanpa judul";
-                        const jawaban = item["jawaban"] || item["answer"] || "";
-                        html += `
-                            <div class="result-item">
-                                <div class="result-title" onclick="showSearchDetail('${sheet}', ${idx})">
-                                    📌 ${escapeHtml(String(title).substring(0, 80))}
-                                </div>
-                                ${jawaban ? `<button class="result-copy-btn" onclick="event.stopPropagation(); copyToClipboard('${escapeHtml(String(jawaban)).replace(/'/g, "\\'")}', this)">📋 Salin</button>` : ''}
-                            </div>
-                        `;
-                    });
-                    if (items.length > 5) {
-                        html += `<div class="result-item" style="color:var(--accent);cursor:pointer;text-align:center;" onclick="loadSheet('${sheet}')">+ ${items.length - 5} hasil lainnya di ${escapeHtml(sheet)}</div>`;
-                    }
-                    html += `</div>`;
-                }
-                html += `</div>`;
-                resultsDiv.innerHTML = html;
-            }, 400);
+                await performSearch(keyword);
+            }, 300);
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            clearBtn.classList.remove('show');
+            input.focus();
+            if (currentView === 'dashboard') {
+                showDashboard();
+            } else if (currentView !== 'dashboard' && currentView !== 'search') {
+                showSheetData(currentView);
+            } else {
+                showDashboard();
+            }
         });
     }
     
-    function showSearchDetail(sheet, idx) {
-        const sheetItems = lastSearchData.filter(item => item.sheet === sheet);
-        const item = sheetItems[idx];
+    async function performSearch(keyword) {
+        const container = document.getElementById('content');
+        container.innerHTML = `<div class="loading"><div class="spinner"></div><p>Mencari "${escapeHtml(keyword)}"...</p></div>`;
+        
+        const results = await searchData(keyword);
+        lastSearchResults = results;
+        currentView = 'search';
+        document.getElementById('pageTitle').innerText = `Hasil: ${keyword}`;
+        
+        if (!results.length) {
+            container.innerHTML = `<div class="empty-state"><span style="font-size:48px;">🔍</span><p>Tidak ada hasil untuk "${escapeHtml(keyword)}"</p></div>`;
+            return;
+        }
+        
+        let html = `<div class="chat-container">`;
+        
+        results.forEach((item, idx) => {
+            const sheet = item.sheet || "Unknown";
+            const title = item.title || item.judul || item.nama || Object.values(item)[0] || "Tanpa judul";
+            const answer = getAnswerFromItem(item);
+            const preview = answer.substring(0, 100) + (answer.length > 100 ? '...' : '');
+            
+            html += `
+                <div class="message-item" onclick="showSearchDetail(${idx})">
+                    <div class="message-avatar">🔍</div>
+                    <div class="message-content">
+                        <div class="message-title">
+                            <span>${escapeHtml(title.substring(0, 50))}</span>
+                            <span class="message-sheet">${escapeHtml(sheet)}</span>
+                        </div>
+                        <div class="message-preview">
+                            <span>${escapeHtml(preview)}</span>
+                            <button class="copy-message-btn" onclick="event.stopPropagation(); copyAnswer('${escapeHtml(answer).replace(/'/g, "\\'")}', this)">📋 Salin</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+
+    // ========================================
+    // DETAIL MODAL
+    // ========================================
+    function showDetail(sheetName, idx) {
+        const data = allSheetsData[sheetName];
+        const item = data[idx];
         if (!item) return;
         
-        const modal = document.getElementById("detailModal");
-        const modalTitle = document.getElementById("modalTitle");
-        const modalBody = document.getElementById("modalBody");
-        const modalAction = document.getElementById("modalAction");
+        const answer = getAnswerFromItem(item);
         
-        modalTitle.innerHTML = `📋 Detail dari ${escapeHtml(sheet)}`;
+        const modal = document.getElementById('detailModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalCopyBtn = document.getElementById('modalCopyBtn');
         
-        let bodyHtml = "";
+        modalTitle.innerHTML = `📋 ${escapeHtml(sheetName)}`;
+        
+        let bodyHtml = '';
         for (const [key, val] of Object.entries(item)) {
-            if (key === "sheet") continue;
-            let valueHtml = isUrl(val) ? `<a href="${val}" target="_blank">${escapeHtml(val)}</a>` : escapeHtml(String(val));
-            
-            if (sheet === "TemplateChat" && (key.toLowerCase().includes("jawab") || key.toLowerCase().includes("answer"))) {
-                valueHtml += `<button class="copy-btn" onclick="copyToClipboard('${escapeHtml(String(val)).replace(/'/g, "\\'")}', this)" style="margin-left:12px;">📋 Salin Jawaban</button>`;
-            }
-            
             bodyHtml += `
                 <div class="detail-row">
                     <div class="detail-label">${escapeHtml(key)}</div>
-                    <div class="detail-value">${valueHtml}</div>
+                    <div class="detail-value">${escapeHtml(String(val))}</div>
                 </div>
             `;
         }
         modalBody.innerHTML = bodyHtml;
         
-        modalAction.onclick = () => {
-            closeModal();
-            loadSheet(sheet);
-        };
-        modalAction.innerHTML = `📄 Lihat semua di ${escapeHtml(sheet)}`;
+        modalCopyBtn.onclick = () => copyAnswer(answer, modalCopyBtn);
         
-        modal.classList.add("active");
+        modal.classList.add('active');
+    }
+    
+    function showSearchDetail(idx) {
+        const item = lastSearchResults[idx];
+        if (!item) return;
         
-        document.getElementById("searchResults").innerHTML = "";
-        document.getElementById("searchInput").value = "";
+        const answer = getAnswerFromItem(item);
+        
+        const modal = document.getElementById('detailModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalCopyBtn = document.getElementById('modalCopyBtn');
+        
+        modalTitle.innerHTML = `📋 ${escapeHtml(item.sheet || 'Detail')}`;
+        
+        let bodyHtml = '';
+        for (const [key, val] of Object.entries(item)) {
+            if (key === 'sheet') continue;
+            bodyHtml += `
+                <div class="detail-row">
+                    <div class="detail-label">${escapeHtml(key)}</div>
+                    <div class="detail-value">${escapeHtml(String(val))}</div>
+                </div>
+            `;
+        }
+        modalBody.innerHTML = bodyHtml;
+        
+        modalCopyBtn.onclick = () => copyAnswer(answer, modalCopyBtn);
+        
+        modal.classList.add('active');
+    }
+    
+    function closeModal() {
+        document.getElementById('detailModal').classList.remove('active');
     }
 
     // ========================================
     // UTILITIES
     // ========================================
-    function isUrl(str) {
-        if (!str || typeof str !== "string") return false;
-        return str.startsWith("http://") || str.startsWith("https://") || str.includes("drive.google.com");
-    }
-    
     function escapeHtml(str) {
-        if (!str) return "";
+        if (!str) return '';
         return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;");
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
     
     function toggleSidebar(show) {
-        const sidebar = document.getElementById("sidebar");
-        const overlay = document.getElementById("sidebarOverlay");
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
         if (show) {
-            sidebar.classList.add("open");
-            overlay.classList.add("active");
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
         } else {
-            sidebar.classList.remove("open");
-            overlay.classList.remove("active");
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
         }
     }
     
     async function refreshData() {
         if (isLoading) {
-            showNotification("⏳ Masih memuat data...");
+            showToast('⏳ Masih memuat...');
             return;
         }
-        showNotification("🔄 Mengambil data terbaru...");
         await loadAllData(true);
     }
 
     // ========================================
     // GLOBAL FUNCTIONS
     // ========================================
-    window.loadDashboard = loadDashboard;
-    window.loadSheet = loadSheet;
     window.showDetail = showDetail;
-    window.changePage = changePage;
-    window.goToPage = goToPage;
-    window.closeModal = closeModal;
     window.showSearchDetail = showSearchDetail;
+    window.closeModal = closeModal;
+    window.copyAnswer = copyAnswer;
     window.refreshData = refreshData;
-    window.copyToClipboard = copyToClipboard;
-    window.copyRowData = copyRowData;
     
     // ========================================
     // INIT
     // ========================================
-    document.addEventListener("DOMContentLoaded", async () => {
-        const mobileBtn = document.getElementById("mobileMenuBtn");
-        const overlay = document.getElementById("sidebarOverlay");
-        const refreshBtn = document.getElementById("refreshBtn");
-        const themeToggle = document.getElementById("themeToggle");
+    document.addEventListener('DOMContentLoaded', async () => {
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const overlay = document.getElementById('sidebarOverlay');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const themeToggleBtn = document.getElementById('themeToggle');
         
         mobileBtn.onclick = () => toggleSidebar(true);
         overlay.onclick = () => toggleSidebar(false);
         refreshBtn.onclick = () => refreshData();
-        themeToggle.onclick = () => toggleTheme();
+        themeToggleBtn.onclick = () => toggleTheme();
         
         initTheme();
         await loadAllData(false);
