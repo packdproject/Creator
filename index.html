@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Creator Vault - Knowledge Hub</title>
+    <!-- PDF.js untuk baca PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Epub.js untuk baca EPUB -->
+    <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/build/epub.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -21,9 +25,8 @@
             --border-color: #eef2f6;
             --accent: #4a9eff;
             --accent-hover: #3a7ecc;
-            --message-bg: #ffffff;
-            --search-bg: #ffffff;
-            --hover-bg: #f5f5f5;
+            --reader-bg: #f5f4ef;
+            --reader-text: #3a3a3a;
         }
 
         body.dark {
@@ -35,9 +38,8 @@
             --sidebar-bg: linear-gradient(180deg, #0a0a0f 0%, #050508 100%);
             --sidebar-text: #e0e0e0;
             --accent: #4a9eff;
-            --message-bg: #2a2a2a;
-            --search-bg: #2a2a2a;
-            --hover-bg: #2a2a2a;
+            --reader-bg: #1a1a1a;
+            --reader-text: #e0e0e0;
         }
 
         body {
@@ -327,6 +329,66 @@
             line-height: 1.4;
         }
 
+        /* Ebook Reader */
+        .reader-container {
+            background: var(--reader-bg);
+            min-height: calc(100vh - 120px);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .reader-toolbar {
+            background: var(--bg-secondary);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .reader-toolbar button, .reader-toolbar select {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .reader-toolbar button:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .reader-content {
+            padding: 20px;
+            height: calc(100vh - 200px);
+            overflow-y: auto;
+            color: var(--reader-text);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        .reader-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .pdf-viewer {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .pdf-page {
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
         /* Context Menu */
         .context-menu {
             position: fixed;
@@ -482,6 +544,7 @@
             .main { margin-left: 0; }
             .stats-grid { grid-template-columns: 1fr; }
             .message-avatar { width: 40px; height: 40px; font-size: 16px; }
+            .reader-toolbar { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -543,13 +606,20 @@
     
     // State
     let allSheetsData = {};
-    let allItemsForSearch = []; // Flat array untuk search cepat
+    let allItemsForSearch = [];
     let sheetsList = [];
     let currentView = "dashboard";
     let currentSheet = null;
     let isLoading = false;
     let isDarkMode = localStorage.getItem('theme') === 'dark';
     let autoRefreshInterval = null;
+    
+    // Ebook reader state
+    let currentBook = null;
+    let currentRendition = null;
+
+    // PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
     // ========================================
     // THEME
@@ -665,7 +735,7 @@
     }
 
     // ========================================
-    // CLIENT-SIDE SEARCH (Cepat, tanpa reload)
+    // CLIENT-SIDE SEARCH
     // ========================================
     function searchLocal(keyword) {
         if (!keyword || keyword.length < 2) return [];
@@ -674,7 +744,6 @@
         const results = [];
         
         for (const item of allItemsForSearch) {
-            // Cari di semua value item
             let found = false;
             for (const val of Object.values(item.data)) {
                 if (val && String(val).toLowerCase().includes(lowerKeyword)) {
@@ -708,12 +777,10 @@
             });
             const results = await Promise.all(promises);
             
-            // Reset search index
             allItemsForSearch = [];
             
             results.forEach(result => {
                 allSheetsData[result.sheet] = result.data;
-                // Build search index
                 result.data.forEach((item, idx) => {
                     allItemsForSearch.push({
                         sheet: result.sheet,
@@ -772,10 +839,15 @@
                     currentView = 'sheet';
                     currentSheet = item.dataset.sheet;
                     document.getElementById('pageTitle').innerText = currentSheet;
-                    showSheetData(currentSheet);
+                    
+                    // Khusus untuk Ebook, tampilkan reader
+                    if (currentSheet === 'Ebook') {
+                        showEbookList();
+                    } else {
+                        showSheetData(currentSheet);
+                    }
                 }
                 
-                // Clear search
                 const searchInput = document.getElementById('searchInput');
                 if (searchInput) searchInput.value = '';
                 document.getElementById('clearSearchBtn').classList.remove('show');
@@ -823,7 +895,228 @@
     }
 
     // ========================================
-    // SHEET DATA
+    // EBOOK READER
+    // ========================================
+    function showEbookList() {
+        const data = allSheetsData['Ebook'] || [];
+        
+        if (!data.length) {
+            document.getElementById('content').innerHTML = `<div class="empty-state"><span style="font-size:48px;">📚</span><p>Tidak ada ebook</p></div>`;
+            return;
+        }
+        
+        let html = `
+            <div class="chat-container">
+                <div class="search-info">📚 ${data.length} ebook tersedia. Klik untuk membaca.</div>
+        `;
+        
+        data.forEach((item, idx) => {
+            const title = item.judul || item.title || item.nama || Object.values(item)[0] || "Tanpa judul";
+            const penulis = item.penulis || item.author || "";
+            const fileUrl = item.file || item.link || item.url || "";
+            
+            html += `
+                <div class="message-item" onclick="openEbookReader(${idx})">
+                    <div class="message-avatar">📖</div>
+                    <div class="message-content">
+                        <div class="message-title">
+                            <span>${escapeHtml(title.substring(0, 50))}</span>
+                            <span class="message-sheet">Ebook</span>
+                        </div>
+                        <div class="message-preview">
+                            ${penulis ? `✍️ ${escapeHtml(penulis)}` : ''}
+                            ${fileUrl ? ` 🔗 Klik untuk baca` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+        document.getElementById('content').innerHTML = html;
+    }
+    
+    async function openEbookReader(idx) {
+        const data = allSheetsData['Ebook'];
+        const item = data[idx];
+        if (!item) return;
+        
+        const title = item.judul || item.title || "Ebook";
+        const fileUrl = item.file || item.link || item.url || "";
+        
+        if (!fileUrl) {
+            showToast('❌ Tidak ada file ebook untuk dibaca');
+            return;
+        }
+        
+        currentView = 'reader';
+        document.getElementById('pageTitle').innerText = `📖 ${title.substring(0, 30)}`;
+        
+        // Tentukan format file
+        const isPDF = fileUrl.toLowerCase().endsWith('.pdf');
+        const isEPUB = fileUrl.toLowerCase().endsWith('.epub');
+        
+        let readerHtml = `
+            <div class="reader-container">
+                <div class="reader-toolbar">
+                    <button onclick="backToEbookList()">← Kembali</button>
+                    <button id="translateBtn">🌐 Translate ke Indonesia</button>
+                    <select id="fontSizeSelect">
+                        <option value="14">Ukuran: Kecil</option>
+                        <option value="16" selected>Ukuran: Normal</option>
+                        <option value="18">Ukuran: Besar</option>
+                        <option value="22">Ukuran: Besar Sekali</option>
+                    </select>
+                    <button id="themeReaderBtn">🎨 Mode Baca</button>
+                </div>
+                <div id="readerContent" class="reader-content">
+                    <div class="loading"><div class="spinner"></div><p>Memuat ebook...</p></div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('content').innerHTML = readerHtml;
+        
+        // Load file berdasarkan format
+        if (isPDF) {
+            await loadPDF(fileUrl);
+        } else if (isEPUB) {
+            await loadEPUB(fileUrl);
+        } else {
+            // Coba tampilkan sebagai iframe untuk Google Docs link
+            const readerContent = document.getElementById('readerContent');
+            readerContent.innerHTML = `<iframe src="${fileUrl}" allow="autoplay"></iframe>`;
+        }
+        
+        // Setup translate
+        const translateBtn = document.getElementById('translateBtn');
+        if (translateBtn) {
+            translateBtn.onclick = () => translateCurrentPage();
+        }
+        
+        // Setup font size
+        const fontSizeSelect = document.getElementById('fontSizeSelect');
+        if (fontSizeSelect) {
+            fontSizeSelect.onchange = (e) => {
+                const readerContent = document.getElementById('readerContent');
+                readerContent.style.fontSize = e.target.value + 'px';
+            };
+        }
+        
+        // Setup theme reader
+        const themeReaderBtn = document.getElementById('themeReaderBtn');
+        if (themeReaderBtn) {
+            themeReaderBtn.onclick = () => {
+                const readerContainer = document.querySelector('.reader-container');
+                if (readerContainer.style.background === 'rgb(42, 42, 42)' || readerContainer.style.background === '#2a2a2a') {
+                    readerContainer.style.background = 'var(--reader-bg)';
+                    readerContainer.style.color = 'var(--reader-text)';
+                } else {
+                    readerContainer.style.background = '#2a2a2a';
+                    readerContainer.style.color = '#e0e0e0';
+                }
+            };
+        }
+    }
+    
+    async function loadPDF(url) {
+        const readerContent = document.getElementById('readerContent');
+        readerContent.innerHTML = '<div class="loading"><div class="spinner"></div><p>Memuat PDF...</p></div>';
+        
+        try {
+            const loadingTask = pdfjsLib.getDocument(url);
+            const pdf = await loadingTask.promise;
+            const numPages = pdf.numPages;
+            
+            let pdfHtml = '<div class="pdf-viewer">';
+            for (let i = 1; i <= numPages; i++) {
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 1.5 });
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                canvas.className = 'pdf-page';
+                
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                await page.render(renderContext).promise;
+                pdfHtml += `<div style="margin-bottom:20px;">${canvas.outerHTML}</div>`;
+            }
+            pdfHtml += '</div>';
+            readerContent.innerHTML = pdfHtml;
+        } catch(error) {
+            console.error('PDF load error:', error);
+            readerContent.innerHTML = `<div class="empty-state"><p>❌ Gagal memuat PDF</p><p>${error.message}</p></div>`;
+        }
+    }
+    
+    async function loadEPUB(url) {
+        const readerContent = document.getElementById('readerContent');
+        readerContent.innerHTML = '<div class="loading"><div class="spinner"></div><p>Memuat EPUB...</p></div>';
+        
+        try {
+            // Gunakan iframe untuk EPUB viewer
+            readerContent.innerHTML = `<iframe src="https://epub-reader.vercel.app/?url=${encodeURIComponent(url)}" style="width:100%;height:100%;border:none;"></iframe>`;
+        } catch(error) {
+            console.error('EPUB load error:', error);
+            readerContent.innerHTML = `<div class="empty-state"><p>❌ Gagal memuat EPUB</p><p>${error.message}</p></div>`;
+        }
+    }
+    
+    async function translateCurrentPage() {
+        const readerContent = document.getElementById('readerContent');
+        const textElements = readerContent.querySelectorAll('p, div:not(.pdf-page), span');
+        
+        if (!textElements.length) {
+            showToast('Tidak ada teks untuk diterjemahkan');
+            return;
+        }
+        
+        showToast('🔄 Menerjemahkan...');
+        
+        for (const element of textElements) {
+            const originalText = element.innerText;
+            if (originalText && originalText.length > 20 && !element.querySelector('canvas')) {
+                try {
+                    const translated = await translateText(originalText);
+                    if (translated && translated !== originalText) {
+                        const originalHtml = element.innerHTML;
+                        element.innerHTML = `${originalHtml}<br><small style="color:var(--accent);">🇮🇩 ${translated}</small>`;
+                    }
+                } catch(e) {
+                    console.error('Translation error:', e);
+                }
+            }
+        }
+        
+        showToast('✅ Terjemahan selesai');
+    }
+    
+    async function translateText(text) {
+        try {
+            // Menggunakan MyMemory API (gratis)
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|id`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.responseData.translatedText;
+        } catch(e) {
+            console.error('Translation API error:', e);
+            return text;
+        }
+    }
+    
+    function backToEbookList() {
+        currentView = 'sheet';
+        currentSheet = 'Ebook';
+        document.getElementById('pageTitle').innerText = 'Ebook';
+        showEbookList();
+    }
+
+    // ========================================
+    // SHEET DATA (Non-Ebook)
     // ========================================
     function showSheetData(sheetName) {
         const data = allSheetsData[sheetName] || [];
@@ -859,7 +1152,7 @@
     }
 
     // ========================================
-    // SEARCH (Client-side, realtime, tanpa reload)
+    // SEARCH
     // ========================================
     let searchDebounce = null;
     
@@ -880,9 +1173,12 @@
             
             searchDebounce = setTimeout(() => {
                 if (keyword.length === 0) {
-                    // Kembali ke view sebelumnya
                     if (currentSheet && currentView === 'sheet') {
-                        showSheetData(currentSheet);
+                        if (currentSheet === 'Ebook') {
+                            showEbookList();
+                        } else {
+                            showSheetData(currentSheet);
+                        }
                     } else {
                         showDashboard();
                     }
@@ -891,7 +1187,6 @@
                 
                 if (keyword.length < 2) return;
                 
-                // Search lokal (cepat, tanpa reload data)
                 const results = searchLocal(keyword);
                 displaySearchResults(results, keyword);
             }, 150);
@@ -903,7 +1198,11 @@
             input.focus();
             
             if (currentSheet && currentView === 'sheet') {
-                showSheetData(currentSheet);
+                if (currentSheet === 'Ebook') {
+                    showEbookList();
+                } else {
+                    showSheetData(currentSheet);
+                }
             } else {
                 showDashboard();
             }
@@ -1045,6 +1344,11 @@
     window.copyToClipboard = copyToClipboard;
     window.showContextMenu = showContextMenu;
     window.manualRefresh = manualRefresh;
+    window.openEbookReader = openEbookReader;
+    window.backToEbookList = backToEbookList;
+    window.loadPDF = loadPDF;
+    window.loadEPUB = loadEPUB;
+    window.translateCurrentPage = translateCurrentPage;
     
     // ========================================
     // INIT
