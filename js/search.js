@@ -4,6 +4,8 @@ function initSearch() {
     const input = document.getElementById('searchInput');
     const clearBtn = document.getElementById('clearSearchBtn');
     
+    if (!input) return;
+    
     input.addEventListener('input', (e) => {
         const keyword = e.target.value;
         
@@ -33,18 +35,20 @@ function initSearch() {
         }, 300);
     });
     
-    clearBtn.addEventListener('click', () => {
-        input.value = '';
-        clearBtn.classList.remove('show');
-        input.focus();
-        if (window.currentView === 'ebook') {
-            if (typeof window.showEbookDashboard === 'function') window.showEbookDashboard();
-        } else if (window.currentView === 'dashboard') {
-            loadDashboard();
-        } else if (window.currentView === 'sheet' && window.currentSheet) {
-            loadSheet(window.currentSheet);
-        }
-    });
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            clearBtn.classList.remove('show');
+            input.focus();
+            if (window.currentView === 'ebook') {
+                if (typeof window.showEbookDashboard === 'function') window.showEbookDashboard();
+            } else if (window.currentView === 'dashboard') {
+                loadDashboard();
+            } else if (window.currentView === 'sheet' && window.currentSheet) {
+                loadSheet(window.currentSheet);
+            }
+        });
+    }
 }
 
 function searchLocal(keyword) {
@@ -86,7 +90,7 @@ function displaySearchResults(results, keyword) {
         const title = Object.values(result.data)[0] || "Tanpa Judul";
         const preview = Object.values(result.data)[1] || "";
         html += `
-            <div class="ebook-card" onclick="showDetailSheet('${result.sheet}', ${idx})" style="cursor:pointer;">
+            <div class="ebook-card" onclick='showSearchDetail(${JSON.stringify(result.data).replace(/'/g, "&#39;")}, "${result.sheet}")' style="cursor:pointer;">
                 <div class="ebook-cover" style="background:#4a9eff;">🔍</div>
                 <div class="ebook-info">
                     <div class="ebook-title">${escapeHtml(title.substring(0, 50))}</div>
@@ -99,28 +103,38 @@ function displaySearchResults(results, keyword) {
     
     html += `</div></div>`;
     container.innerHTML = html;
+}
+
+function showSearchDetail(item, sheetName) {
+    const modal = document.getElementById('detailModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
     
-    // Override showDetailSheet untuk search results
-    window.showDetailSheet = function(sheetName, idx) {
-        const result = results[idx];
-        if (!result) return;
-        
-        const modal = document.getElementById('detailModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalBody = document.getElementById('modalBody');
-        
-        modalTitle.innerHTML = `📋 ${escapeHtml(sheetName)}`;
-        
-        let bodyHtml = '';
-        for (const [key, val] of Object.entries(result.data)) {
-            bodyHtml += `
-                <div class="detail-row">
-                    <div style="font-weight:600; color:var(--accent); margin-bottom:4px;">${escapeHtml(key)}</div>
-                    <div>${escapeHtml(String(val))}</div>
-                </div>
-            `;
+    modalTitle.innerHTML = `📋 ${escapeHtml(sheetName)}`;
+    
+    let bodyHtml = '';
+    for (const [key, val] of Object.entries(item)) {
+        let displayVal = val;
+        if (typeof val === 'string' && (val.includes('drive.google.com') || val.includes('http'))) {
+            displayVal = `<a href="${val}" target="_blank">🔗 ${escapeHtml(val)}</a>`;
         }
-        modalBody.innerHTML = bodyHtml;
-        modal.classList.add('active');
-    };
+        bodyHtml += `
+            <div class="detail-row">
+                <div style="font-weight:600; color:var(--accent); margin-bottom:4px;">${escapeHtml(key)}</div>
+                <div>${displayVal}</div>
+            </div>
+        `;
+    }
+    modalBody.innerHTML = bodyHtml;
+    modal.classList.add('active');
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
