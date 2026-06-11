@@ -3,5 +3,4 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxtkfn059eEdHCPKPeYMu5U
 
 // App configuration
 const APP_NAME = "Creator Vault";
-const APP_VERSION = "2.0";
-const ITEMS_PER_PAGE = 20;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 menit cache
