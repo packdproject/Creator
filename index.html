@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Creator Vault - Personal Knowledge Hub</title>
+    <title>Creator Vault - Knowledge Hub</title>
     <style>
         * {
             margin: 0;
@@ -11,30 +11,24 @@
             box-sizing: border-box;
         }
 
-        /* ===== VARIABLES ===== */
         :root {
-            --bg-primary: #f5f7fb;
+            --bg-primary: #f0f2f5;
             --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
+            --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            --sidebar-text: #ffffff;
             --text-primary: #1a1a2e;
             --text-secondary: #666666;
             --border-color: #eef2f6;
-            --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
-            --sidebar-text: #ffffff;
-            --sidebar-hover: rgba(255,255,255,0.1);
             --accent: #4a9eff;
             --accent-hover: #3a7ecc;
             --message-bg: #ffffff;
-            --message-bg-own: #dcf8c6;
-            --message-text: #1a1a2e;
             --search-bg: #ffffff;
-            --shadow: rgba(0,0,0,0.04);
+            --hover-bg: #f5f5f5;
         }
 
         body.dark {
             --bg-primary: #0a0a0a;
             --bg-secondary: #1a1a1a;
-            --bg-card: #1e1e1e;
             --text-primary: #ffffff;
             --text-secondary: #aaaaaa;
             --border-color: #2a2a2a;
@@ -42,9 +36,8 @@
             --sidebar-text: #e0e0e0;
             --accent: #4a9eff;
             --message-bg: #2a2a2a;
-            --message-bg-own: #1e3a2a;
-            --message-text: #ffffff;
             --search-bg: #2a2a2a;
+            --hover-bg: #2a2a2a;
         }
 
         body {
@@ -126,7 +119,7 @@
         }
 
         .menu-item:hover {
-            background: var(--sidebar-hover);
+            background: rgba(255,255,255,0.1);
         }
 
         .menu-item.active {
@@ -195,7 +188,7 @@
             border: none;
         }
 
-        /* Search Container - Like WhatsApp */
+        /* Search Container */
         .search-container {
             padding: 12px 24px;
             background: var(--bg-secondary);
@@ -257,7 +250,7 @@
         }
 
         .stat-card {
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             border-radius: 20px;
             padding: 24px;
             text-align: center;
@@ -270,29 +263,11 @@
             color: var(--accent);
         }
 
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 6px;
-        }
-
-        /* Chat/Message Results - Like WhatsApp/Telegram */
+        /* Chat Container */
         .chat-container {
             flex: 1;
             overflow-y: auto;
             padding: 16px 24px;
-            background: var(--bg-primary);
-        }
-
-        .message-group {
-            margin-bottom: 24px;
-        }
-
-        .message-date {
-            text-align: center;
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
         }
 
         .message-item {
@@ -302,10 +277,12 @@
             transition: background 0.2s;
             padding: 12px;
             border-radius: 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
         }
 
         .message-item:hover {
-            background: var(--bg-card);
+            background: var(--hover-bg);
         }
 
         .message-avatar {
@@ -327,8 +304,8 @@
 
         .message-title {
             font-weight: 600;
-            font-size: 15px;
-            margin-bottom: 4px;
+            font-size: 14px;
+            margin-bottom: 6px;
             display: flex;
             align-items: baseline;
             gap: 8px;
@@ -346,29 +323,43 @@
         .message-preview {
             font-size: 13px;
             color: var(--text-secondary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            margin-bottom: 8px;
+            line-height: 1.4;
         }
 
-        .copy-message-btn {
-            background: var(--accent);
-            border: none;
-            padding: 6px 14px;
-            border-radius: 20px;
-            color: white;
+        /* Context Menu (Copy Popup) */
+        .context-menu {
+            position: fixed;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 3000;
+            overflow: hidden;
+            min-width: 180px;
+        }
+
+        .context-menu-item {
+            padding: 12px 16px;
             cursor: pointer;
-            font-size: 11px;
-            transition: all 0.2s;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
         }
 
-        .copy-message-btn:hover {
-            background: var(--accent-hover);
+        .context-menu-item:hover {
+            background: var(--hover-bg);
         }
 
-        /* Detail Modal */
+        .context-menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 4px 0;
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -387,7 +378,7 @@
         }
 
         .modal-content {
-            background: var(--bg-card);
+            background: var(--bg-secondary);
             border-radius: 28px;
             max-width: 500px;
             width: 90%;
@@ -403,7 +394,7 @@
             align-items: center;
             position: sticky;
             top: 0;
-            background: var(--bg-card);
+            background: var(--bg-secondary);
         }
 
         .modal-body {
@@ -413,6 +404,13 @@
         .detail-row {
             padding: 12px 0;
             border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 8px;
+        }
+
+        .detail-row:hover {
+            background: var(--hover-bg);
         }
 
         .detail-label {
@@ -425,6 +423,7 @@
         .detail-value {
             font-size: 14px;
             word-break: break-word;
+            line-height: 1.5;
         }
 
         .detail-value pre {
@@ -435,24 +434,10 @@
             font-family: monospace;
             font-size: 13px;
             margin-top: 6px;
+            white-space: pre-wrap;
         }
 
-        .modal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--border-color);
-            text-align: right;
-        }
-
-        .btn-copy {
-            background: var(--accent);
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            color: white;
-            cursor: pointer;
-        }
-
-        /* Loading & Empty */
+        /* Loading */
         .loading, .empty-state {
             text-align: center;
             padding: 60px;
@@ -496,32 +481,13 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: flex;
-            }
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .sidebar-overlay.active {
-                display: block;
-            }
-            .main {
-                margin-left: 0;
-            }
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            .message-item {
-                padding: 10px;
-            }
-            .message-avatar {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-            }
+            .mobile-menu-btn { display: flex; }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .main { margin-left: 0; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .message-avatar { width: 40px; height: 40px; font-size: 16px; }
         }
     </style>
 </head>
@@ -531,42 +497,35 @@
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div style="display: flex; min-height: 100vh;">
-    <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span>🏦 Creator Vault</span>
-            <span style="font-size: 12px; opacity:0.6;">v2.0</span>
+            <span style="font-size: 11px; opacity:0.5;">v2.0</span>
         </div>
         <ul class="menu" id="sidebarMenu">
             <li class="menu-separator">━━ MENU ━━</li>
         </ul>
     </aside>
 
-    <!-- Main Content -->
     <main class="main">
         <div class="main-header">
             <h1 id="pageTitle">Dashboard</h1>
             <div class="header-actions">
                 <button class="theme-toggle" id="themeToggle">🌙</button>
-                <button class="refresh-btn" id="refreshBtn">🔄</button>
+                <button class="refresh-btn" id="refreshBtn">🔄 Refresh</button>
             </div>
         </div>
 
-        <!-- Search Container -->
         <div class="search-container">
             <div class="search-wrapper">
                 <span>🔍</span>
-                <input type="text" id="searchInput" class="search-box" placeholder="Cari pesan atau template...">
+                <input type="text" id="searchInput" class="search-box" placeholder="Cari pesan atau template..." autocomplete="off">
                 <button class="clear-search" id="clearSearchBtn">✕</button>
             </div>
         </div>
 
-        <!-- Content Area -->
         <div id="content" class="chat-container">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Memuat data...</p>
-            </div>
+            <div class="loading"><div class="spinner"></div><p>Memuat data...</p></div>
         </div>
     </main>
 </div>
@@ -576,12 +535,9 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modalTitle">Detail Pesan</h3>
-            <button class="close-modal" onclick="closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
+            <button onclick="closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;">✕</button>
         </div>
         <div class="modal-body" id="modalBody"></div>
-        <div class="modal-footer">
-            <button class="btn-copy" id="modalCopyBtn">📋 Salin Jawaban</button>
-        </div>
     </div>
 </div>
 
@@ -595,9 +551,11 @@
     let allSheetsData = {};
     let sheetsList = [];
     let currentView = "dashboard";
+    let currentSheet = null;
     let lastSearchResults = [];
     let isLoading = false;
     let isDarkMode = localStorage.getItem('theme') === 'dark';
+    let autoRefreshInterval = null;
 
     // ========================================
     // THEME
@@ -625,43 +583,59 @@
     }
 
     // ========================================
-    // COPY FUNCTION (Column 4 / Jawaban)
+    // COPY FUNCTION dengan Context Menu
     // ========================================
-    async function copyAnswer(text, buttonElement) {
+    let currentContextMenu = null;
+
+    function showContextMenu(event, text, label) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        if (currentContextMenu) {
+            currentContextMenu.remove();
+        }
+        
+        const menu = document.createElement('div');
+        menu.className = 'context-menu';
+        menu.style.left = event.clientX + 'px';
+        menu.style.top = event.clientY + 'px';
+        
+        menu.innerHTML = `
+            <div class="context-menu-item" onclick="copyToClipboard('${escapeHtml(text).replace(/'/g, "\\'")}', this)">
+                📋 Salin ${label}
+            </div>
+        `;
+        
+        document.body.appendChild(menu);
+        currentContextMenu = menu;
+        
+        setTimeout(() => {
+            document.addEventListener('click', function removeMenu() {
+                if (currentContextMenu) {
+                    currentContextMenu.remove();
+                    currentContextMenu = null;
+                }
+                document.removeEventListener('click', removeMenu);
+            });
+        }, 10);
+    }
+
+    async function copyToClipboard(text, buttonElement) {
         try {
             await navigator.clipboard.writeText(text);
             const originalText = buttonElement.innerHTML;
             buttonElement.innerHTML = '✓ Tersalin!';
             setTimeout(() => {
                 buttonElement.innerHTML = originalText;
+                if (currentContextMenu) {
+                    currentContextMenu.remove();
+                    currentContextMenu = null;
+                }
             }, 1500);
-            showToast('✅ Jawaban tersalin!');
+            showToast('✅ Berhasil tersalin!');
         } catch(err) {
             showToast('❌ Gagal menyalin');
         }
-    }
-
-    function getAnswerFromItem(item) {
-        // Cari kolom ke-4 atau field jawaban
-        const values = Object.values(item);
-        // Kolom ke-4 (index 3) jika ada
-        if (values.length >= 4) {
-            return values[3] || values[2] || values[1] || "";
-        }
-        // Atau cari field yang mengandung kata jawaban/answer
-        for (let [key, val] of Object.entries(item)) {
-            if (key.toLowerCase().includes('jawab') || key.toLowerCase().includes('answer')) {
-                return val || "";
-            }
-        }
-        // Ambil field terpanjang sebagai konten
-        let longest = "";
-        for (let val of values) {
-            if (typeof val === 'string' && val.length > longest.length && val.length > 20) {
-                longest = val;
-            }
-        }
-        return longest || values[1] || "";
     }
 
     function showToast(message) {
@@ -697,18 +671,21 @@
     }
 
     async function searchData(keyword) {
-        if (!keyword || keyword.length < 2) return [];
+        if (!keyword || keyword.length < 1) return [];
         const res = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(keyword)}`);
         const data = await res.json();
         return Array.isArray(data) ? data : [];
     }
 
     // ========================================
-    // LOAD ALL DATA
+    // LOAD ALL DATA (ONCE)
     // ========================================
     async function loadAllData(showToastMsg = false) {
         if (isLoading) return;
         isLoading = true;
+        
+        const content = document.getElementById('content');
+        content.innerHTML = `<div class="loading"><div class="spinner"></div><p>Memuat data...</p></div>`;
         
         try {
             sheetsList = await getSheets();
@@ -727,7 +704,7 @@
             if (showToastMsg) showToast('✅ Data diperbarui');
         } catch(error) {
             console.error(error);
-            document.getElementById('content').innerHTML = `<div class="empty-state"><p>⚠️ Gagal memuat data</p><button class="refresh-btn" onclick="location.reload()" style="margin-top:16px;">Refresh</button></div>`;
+            content.innerHTML = `<div class="empty-state"><p>⚠️ Gagal memuat data</p><button class="refresh-btn" onclick="location.reload()" style="margin-top:16px;">Refresh</button></div>`;
         } finally {
             isLoading = false;
         }
@@ -762,12 +739,14 @@
                 
                 if (item.dataset.view === 'dashboard') {
                     currentView = 'dashboard';
+                    currentSheet = null;
                     document.getElementById('pageTitle').innerText = 'Dashboard';
                     showDashboard();
                 } else if (item.dataset.sheet) {
                     currentView = 'sheet';
-                    document.getElementById('pageTitle').innerText = item.dataset.sheet;
-                    showSheetData(item.dataset.sheet);
+                    currentSheet = item.dataset.sheet;
+                    document.getElementById('pageTitle').innerText = currentSheet;
+                    showSheetData(currentSheet);
                 }
                 
                 if (window.innerWidth <= 768) toggleSidebar(false);
@@ -778,12 +757,9 @@
     }
 
     // ========================================
-    // DASHBOARD (Analytics Only)
+    // DASHBOARD
     // ========================================
     function showDashboard() {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('clearSearchBtn').classList.remove('show');
-        
         const totalItems = Object.values(allSheetsData).reduce((sum, data) => sum + data.length, 0);
         
         document.getElementById('content').innerHTML = `
@@ -791,21 +767,21 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-number">${sheetsList.length}</div>
-                        <div class="stat-label">Database</div>
+                        <div>Database</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">${totalItems}</div>
-                        <div class="stat-label">Total Items</div>
+                        <div>Total Items</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">⚡</div>
-                        <div class="stat-label">Real-time</div>
+                        <div>Ready</div>
                     </div>
                 </div>
                 <div class="stat-card">
                     <h3 style="margin-bottom:16px;">📊 Statistik per Database</h3>
                     ${sheetsList.map(sheet => `
-                        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-color);">
+                        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color);">
                             <span>📄 ${escapeHtml(sheet)}</span>
                             <span style="color:var(--accent);">${allSheetsData[sheet]?.length || 0} items</span>
                         </div>
@@ -816,61 +792,52 @@
     }
 
     // ========================================
-    // SHEET DATA (Chat Style)
+    // SHEET DATA
     // ========================================
     function showSheetData(sheetName) {
         const data = allSheetsData[sheetName] || [];
-        renderChatMessages(data, sheetName);
+        renderMessages(data, sheetName);
     }
 
-    function renderChatMessages(data, sheetName) {
-        const container = document.getElementById('content');
-        
+    function renderMessages(data, source) {
         if (!data.length) {
-            container.innerHTML = `<div class="empty-state"><span style="font-size:48px;">📭</span><p>Tidak ada data</p></div>`;
+            document.getElementById('content').innerHTML = `<div class="empty-state"><span style="font-size:48px;">📭</span><p>Tidak ada data</p></div>`;
             return;
         }
         
-        let html = `<div class="chat-container">`;
-        
+        let html = ``;
         data.forEach((item, idx) => {
             const title = Object.values(item)[0] || "Tanpa judul";
-            const answer = getAnswerFromItem(item);
-            const preview = answer.substring(0, 100) + (answer.length > 100 ? '...' : '');
+            const preview = (Object.values(item)[3] || Object.values(item)[2] || "").substring(0, 80);
             
             html += `
-                <div class="message-item" onclick="showDetail('${sheetName}', ${idx})">
+                <div class="message-item" onclick="showDetail('${source}', ${idx})">
                     <div class="message-avatar">💬</div>
                     <div class="message-content">
                         <div class="message-title">
                             <span>${escapeHtml(title.substring(0, 50))}</span>
-                            <span class="message-sheet">${escapeHtml(sheetName)}</span>
+                            <span class="message-sheet">${escapeHtml(source)}</span>
                         </div>
-                        <div class="message-preview">
-                            <span>${escapeHtml(preview)}</span>
-                            <button class="copy-message-btn" onclick="event.stopPropagation(); copyAnswer('${escapeHtml(answer).replace(/'/g, "\\'")}', this)">📋 Salin</button>
-                        </div>
+                        <div class="message-preview">${escapeHtml(preview)}</div>
                     </div>
                 </div>
             `;
         });
         
-        html += `</div>`;
-        container.innerHTML = html;
+        document.getElementById('content').innerHTML = `<div class="chat-container">${html}</div>`;
     }
 
     // ========================================
-    // SEARCH (Chat Style Results)
+    // SEARCH (Realtime, tidak lompat)
     // ========================================
-    let searchTimeout;
+    let searchDebounce = null;
     
     function initSearch() {
         const input = document.getElementById('searchInput');
         const clearBtn = document.getElementById('clearSearchBtn');
         
-        input.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            const keyword = input.value.trim();
+        input.addEventListener('input', (e) => {
+            const keyword = e.target.value;
             
             if (keyword.length > 0) {
                 clearBtn.classList.add('show');
@@ -878,30 +845,31 @@
                 clearBtn.classList.remove('show');
             }
             
-            if (keyword.length < 2) {
-                if (currentView === 'dashboard') {
-                    showDashboard();
-                } else if (currentView !== 'dashboard' && currentView !== 'search') {
-                    showSheetData(currentView);
-                } else {
-                    showDashboard();
-                }
-                return;
-            }
+            if (searchDebounce) clearTimeout(searchDebounce);
             
-            searchTimeout = setTimeout(async () => {
+            searchDebounce = setTimeout(async () => {
+                if (keyword.length === 0) {
+                    if (currentSheet && currentView === 'sheet') {
+                        showSheetData(currentSheet);
+                    } else {
+                        showDashboard();
+                    }
+                    return;
+                }
+                
+                if (keyword.length < 2) return;
+                
                 await performSearch(keyword);
-            }, 300);
+            }, 200);
         });
         
         clearBtn.addEventListener('click', () => {
             input.value = '';
             clearBtn.classList.remove('show');
             input.focus();
-            if (currentView === 'dashboard') {
-                showDashboard();
-            } else if (currentView !== 'dashboard' && currentView !== 'search') {
-                showSheetData(currentView);
+            
+            if (currentSheet && currentView === 'sheet') {
+                showSheetData(currentSheet);
             } else {
                 showDashboard();
             }
@@ -922,13 +890,11 @@
             return;
         }
         
-        let html = `<div class="chat-container">`;
-        
+        let html = ``;
         results.forEach((item, idx) => {
             const sheet = item.sheet || "Unknown";
             const title = item.title || item.judul || item.nama || Object.values(item)[0] || "Tanpa judul";
-            const answer = getAnswerFromItem(item);
-            const preview = answer.substring(0, 100) + (answer.length > 100 ? '...' : '');
+            const preview = (Object.values(item)[3] || Object.values(item)[2] || "").substring(0, 80);
             
             html += `
                 <div class="message-item" onclick="showSearchDetail(${idx})">
@@ -938,48 +904,42 @@
                             <span>${escapeHtml(title.substring(0, 50))}</span>
                             <span class="message-sheet">${escapeHtml(sheet)}</span>
                         </div>
-                        <div class="message-preview">
-                            <span>${escapeHtml(preview)}</span>
-                            <button class="copy-message-btn" onclick="event.stopPropagation(); copyAnswer('${escapeHtml(answer).replace(/'/g, "\\'")}', this)">📋 Salin</button>
-                        </div>
+                        <div class="message-preview">${escapeHtml(preview)}</div>
                     </div>
                 </div>
             `;
         });
         
-        html += `</div>`;
-        container.innerHTML = html;
+        container.innerHTML = `<div class="chat-container">${html}</div>`;
     }
 
     // ========================================
-    // DETAIL MODAL
+    // DETAIL MODAL with Click to Copy
     // ========================================
     function showDetail(sheetName, idx) {
         const data = allSheetsData[sheetName];
         const item = data[idx];
         if (!item) return;
         
-        const answer = getAnswerFromItem(item);
-        
         const modal = document.getElementById('detailModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
-        const modalCopyBtn = document.getElementById('modalCopyBtn');
         
-        modalTitle.innerHTML = `📋 ${escapeHtml(sheetName)}`;
+        modalTitle.innerHTML = `📋 ${escapeHtml(sheetName)} (Klik kolom untuk salin)`;
         
         let bodyHtml = '';
+        let colIndex = 0;
         for (const [key, val] of Object.entries(item)) {
+            const label = `Kolom ${colIndex + 1} - ${key}`;
             bodyHtml += `
-                <div class="detail-row">
+                <div class="detail-row" onclick="showContextMenu(event, '${escapeHtml(String(val)).replace(/'/g, "\\'")}', '${escapeHtml(label)}')">
                     <div class="detail-label">${escapeHtml(key)}</div>
                     <div class="detail-value">${escapeHtml(String(val))}</div>
                 </div>
             `;
+            colIndex++;
         }
         modalBody.innerHTML = bodyHtml;
-        
-        modalCopyBtn.onclick = () => copyAnswer(answer, modalCopyBtn);
         
         modal.classList.add('active');
     }
@@ -988,34 +948,53 @@
         const item = lastSearchResults[idx];
         if (!item) return;
         
-        const answer = getAnswerFromItem(item);
-        
         const modal = document.getElementById('detailModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
-        const modalCopyBtn = document.getElementById('modalCopyBtn');
         
-        modalTitle.innerHTML = `📋 ${escapeHtml(item.sheet || 'Detail')}`;
+        modalTitle.innerHTML = `📋 ${escapeHtml(item.sheet || 'Detail')} (Klik kolom untuk salin)`;
         
         let bodyHtml = '';
+        let colIndex = 0;
         for (const [key, val] of Object.entries(item)) {
             if (key === 'sheet') continue;
+            const label = `Kolom ${colIndex + 1} - ${key}`;
             bodyHtml += `
-                <div class="detail-row">
+                <div class="detail-row" onclick="showContextMenu(event, '${escapeHtml(String(val)).replace(/'/g, "\\'")}', '${escapeHtml(label)}')">
                     <div class="detail-label">${escapeHtml(key)}</div>
                     <div class="detail-value">${escapeHtml(String(val))}</div>
                 </div>
             `;
+            colIndex++;
         }
         modalBody.innerHTML = bodyHtml;
-        
-        modalCopyBtn.onclick = () => copyAnswer(answer, modalCopyBtn);
         
         modal.classList.add('active');
     }
     
     function closeModal() {
         document.getElementById('detailModal').classList.remove('active');
+    }
+
+    // ========================================
+    // AUTO REFRESH & MANUAL
+    // ========================================
+    function startAutoRefresh() {
+        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        autoRefreshInterval = setInterval(() => {
+            if (!isLoading) {
+                loadAllData(false);
+            }
+        }, 60 * 60 * 1000);
+    }
+    
+    async function manualRefresh() {
+        if (isLoading) {
+            showToast('⏳ Masih memuat...');
+            return;
+        }
+        showToast('🔄 Mengambil data terbaru...');
+        await loadAllData(true);
     }
 
     // ========================================
@@ -1042,14 +1021,6 @@
             overlay.classList.remove('active');
         }
     }
-    
-    async function refreshData() {
-        if (isLoading) {
-            showToast('⏳ Masih memuat...');
-            return;
-        }
-        await loadAllData(true);
-    }
 
     // ========================================
     // GLOBAL FUNCTIONS
@@ -1057,8 +1028,9 @@
     window.showDetail = showDetail;
     window.showSearchDetail = showSearchDetail;
     window.closeModal = closeModal;
-    window.copyAnswer = copyAnswer;
-    window.refreshData = refreshData;
+    window.copyToClipboard = copyToClipboard;
+    window.showContextMenu = showContextMenu;
+    window.manualRefresh = manualRefresh;
     
     // ========================================
     // INIT
@@ -1071,12 +1043,13 @@
         
         mobileBtn.onclick = () => toggleSidebar(true);
         overlay.onclick = () => toggleSidebar(false);
-        refreshBtn.onclick = () => refreshData();
+        refreshBtn.onclick = () => manualRefresh();
         themeToggleBtn.onclick = () => toggleTheme();
         
         initTheme();
         await loadAllData(false);
         initSearch();
+        startAutoRefresh();
     });
 </script>
 </body>
